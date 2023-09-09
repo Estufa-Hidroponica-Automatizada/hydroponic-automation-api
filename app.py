@@ -33,20 +33,47 @@ airControlService = AirControlService(dht22, relays, databaseService)
 waterControlService = WaterControlService(ec, ph, waterLevel, waterTemp, relays, databaseService)
 lightControlService = LightControlService(light, relays, databaseService)
 
-#ENDPOINTS
-# - Get todos os valores
-# - Get valores com historico
-# - Get limites - (db)
-# - Set limites (valores devem ser armazenados em banco para não perde-los)
-
-@app.route('/')
-def hello_world():
+@app.route('/sensor', methods=['GET'])
+def read_sensors():
     return 'Hello, World!'
 
-@app.route('/api/data')
-def get_data():
+@app.route('/sensor/<sensor>', methods=['GET'])
+def read_sensor(sensor):
+    return 'Hello, World!'
+
+@app.route('/sensor/<sensor>/history', methods=['GET'])
+def read_sensor_history(sensor):
     data = {'message': 'This is sample data from the API.'}
     return jsonify(data)
 
+@app.route('/limit', methods=['GET'])
+def get_limits():
+    data = {'message': 'This is sample data from the API.'}
+    return jsonify(data)
+
+@app.route('/limit/<value>', methods=['GET'])
+def get_limit(value):
+    data = {'message': 'This is sample data from the API.'}
+    return jsonify(data)
+
+@app.route('/limit/<value>', methods=['POST'])
+def set_limit(value):
+    data = {'message': 'This is sample data from the API.'}
+    return jsonify(data)
+
+@app.route('/light/schedule', methods=['GET'])
+def get_limit(value):
+    data = {'message': 'This is sample data from the API.'}
+    return jsonify(data)
+
+@app.route('/light/schedule', methods=['POST'])
+def set_limit(value):
+    data = {'message': 'This is sample data from the API.'}
+    return jsonify(data)
+
+@app.teardown_appcontext
+def cleanup_app_context(exception=None):
+    databaseService.close()
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
