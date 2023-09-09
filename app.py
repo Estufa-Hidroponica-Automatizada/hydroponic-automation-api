@@ -62,12 +62,12 @@ def set_limit(value):
     return jsonify(data)
 
 @app.route('/light/schedule', methods=['GET'])
-def get_limit(value):
+def get_limit():
     data = {'message': 'This is sample data from the API.'}
     return jsonify(data)
 
 @app.route('/light/schedule', methods=['POST'])
-def set_limit(value):
+def set_limit():
     data = {'message': 'This is sample data from the API.'}
     return jsonify(data)
 
