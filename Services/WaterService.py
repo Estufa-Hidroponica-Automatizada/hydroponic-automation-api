@@ -1,4 +1,4 @@
-class WaterControlService():
+class WaterService():
     def __init__(self, ec, ph, waterLevel, waterTemp, relays, database, limitService):
         self.ec = ec
         self.ph = ph

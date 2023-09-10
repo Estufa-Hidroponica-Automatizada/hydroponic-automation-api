@@ -6,7 +6,7 @@ class LightService():
         self.dht22 = light
         self.relays = relays
         self.database = database
-        self.schedule = self.database.fetch_light_schedule()
+        self.schedule = database.fetch_light_schedule()
     
     def update_schedule(self, id, hour, minute, state):
         self.database.update_schedule(id, hour, minute, state)

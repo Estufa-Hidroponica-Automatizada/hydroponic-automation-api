@@ -6,10 +6,12 @@ class LimitService():
         self.limits = database.fetch_limits()
 
     def get_limit(self, name):
-        return self.limits[name]
+        for limit in self.limits:
+            if limit[1] == name:
+                return limit
     
     def set_limit(self, name, value):
-        self.database.update_limit_value()
-        self.limits[name] = value
+        self.database.update_limit_value(name, value)
+        self.limits = self.database.fetch_limits()
         return True
         

@@ -11,7 +11,7 @@ from Services.AirControlService import AirControlService
 from Services.DatabaseService import DatabaseService
 from Services.LightService import LightService
 from Services.LimitService import LimitService
-from Services.WaterControlService import WaterControlService
+from Services.WaterService import WaterService
 
 from flask_apscheduler import APScheduler
 
@@ -36,8 +36,8 @@ relays = {
 }
 databaseService = DatabaseService()
 limitService = LimitService(databaseService)
-airControlService = AirControlService(dht22, relays, databaseService)
-waterControlService = WaterControlService(ec, ph, waterLevel, waterTemp, relays, databaseService)
+airControlService = AirControlService(dht22, relays, databaseService, limitService)
+waterService = WaterService(ec, ph, waterLevel, waterTemp, relays, databaseService, limitService)
 lightService = LightService(light, relays, databaseService)
 
 @app.route('/sensor', methods=['GET']) # Retorna todos os valores medidos nos sensores
@@ -55,7 +55,7 @@ def read_sensor_history(sensor):
 
 @app.route('/limit', methods=['GET']) # Retorna a lista de limites
 def get_limits():
-    return jsonify(limitService.limits)
+    return jsonify(limitService.limits), 200
 
 @app.route('/limit/<value>', methods=['GET', 'POST']) # Retorna o valor do limite passado | Seta valor do limite passado, como receber body?
 def get_limit(value):
@@ -70,25 +70,25 @@ def get_limit(value):
             return jsonify({'error': 'Invalid JSON data'}), 400
 
 @app.route('/light/schedule', methods=['GET', 'PUT', 'POST', 'DELETE']) # Altera horario existente | Adiciona horario novo
-def set_light_schedule():
+def light_schedule():
     if request.method == 'GET':
         return jsonify(lightService.schedule)
     elif request.method == 'PUT':
         data = request.get_json()
         lightService.update_schedule(data['id'], data['hour'], data['minute'], data['state'])
-        return jsonify({True})
+        return jsonify({True}), 200
     elif request.method == 'POST':
         data = request.get_json()
         lightService.insert_schedule(data['hour'], data['minute'], data['state'])
-        return jsonify({True})
+        return jsonify({True}), 200
     
 @app.route('/light/schedule/<id>', methods=['GET', 'DELETE']) # pega horario existente | deleta horario existente
-def set_light_schedule(id):
+def light_schedule_id(id):
     if request.method == 'GET':
-        return jsonify(lightService.schedule) # como pega pelo id
+        return jsonify(lightService.schedule), 200 # como pega pelo id
     elif request.method == 'DELETE':
         lightService.delete_schedule(id)
-        return jsonify({True})
+        return jsonify({True}), 200
 
 @app.route('/actuator/relay/<name>', methods=['POST']) # Liga ou desliga relay passado
 def set_limit(name):
@@ -96,12 +96,12 @@ def set_limit(name):
     return jsonify(data)
 
 @app.route('/cam/<action>', methods=['GET']) # retorna foto/stream/timelapse da estufa
-def get_limit():
+def cam_endpoint(action):
     data = {'message': 'This is sample data from the API.'}
     return jsonify(data)
 
 @app.route('/login', methods=['POST']) # faz login
-def get_limit():
+def login():
     data = {'message': 'This is sample data from the API.'}
     return jsonify(data)
 
