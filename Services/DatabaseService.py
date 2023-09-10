@@ -22,27 +22,36 @@ class DatabaseService():
             self.cursor.executescript(schema_sql)
             self.conn.commit()
 
+    def fetch_limits(self):
+        self.cursor.execute('SELECT * FROM limit_value')
+        limit = self.cursor.fetchall()
+        return limit
+
     def fetch_limit_value(self, name):
         self.cursor.execute('SELECT value FROM limit_value WHERE name = ?', (name))
         limit = self.cursor.fetchone()
         return limit
     
+    def update_limit_value(self, name, value):
+        self.cursor.execute('UPDATE limit_value SET value = ? WHERE name = ?', (value, name))
+        self.conn.commit()
+    
     def fetch_light_schedule(self):
-        self.cursor.execute('SELECT hour, minute, state FROM light_schedule')
+        self.cursor.execute('SELECT * FROM light_schedule')
         schedule = self.cursor.fetchall()
         return schedule
+    
+    def update_schedule(self, id, hour, minute, state):
+        self.cursor.execute('UPDATE light_schedule SET hour = ?, minute = ?, state, = ? WHERE id = ?', (hour, minute, state, id))
+        self.conn.commit()
 
-    # def add_user(self, username, email):
-    #     self.cursor.execute('INSERT INTO users (username, email) VALUES (?, ?)', (username, email))
-    #     self.conn.commit()
+    def insert_schedule(self, hour, minute, state):
+        self.cursor.execute('INSERT INTO light_schedule (hour, minute, state) VALUES (?, ?, ?)', (hour, minute, state))
+        self.conn.commit()
 
-    # def update_user(self, user_id, username, email):
-    #     self.cursor.execute('UPDATE users SET username = ?, email = ? WHERE id = ?', (username, email, user_id))
-    #     self.conn.commit()
-
-    # def delete_user(self, user_id):
-    #     self.cursor.execute('DELETE FROM users WHERE id = ?', (user_id,))
-    #     self.conn.commit()
+    def delete_schedule(self, id):
+        self.cursor.execute('DELETE FROM light_schedule WHERE id = ?', (id))
+        self.conn.commit()
 
     def close(self):
         self.conn.close()
