@@ -42,26 +42,46 @@ lightService = LightService(light, relays, databaseService)
 
 @app.route('/sensor', methods=['GET']) # Retorna todos os valores medidos nos sensores
 def read_sensors():
-    return 'Hello, World!'
+    temp, humidity = dht22.read_value()
+    return jsonify({
+        "airTemperature": temp,
+        "humidity": humidity,
+        "waterTemperature": waterTemp.read_value(),
+        "pH": ph.read_value(),
+        "EC": ec.read_value(),
+        "waterLevel": waterLevel.read_value(),
+        "light": light.read_value()
+    }), 200
 
 @app.route('/sensor/<sensor>', methods=['GET']) # Retorna o valor medido no sensor passado
 def read_sensor(sensor):
-    return 'Hello, World!'
-
-@app.route('/sensor/<sensor>/history', methods=['GET']) # Retorna o histórico dos valores do sensor passado
-def read_sensor_history(sensor):
-    data = {'message': 'This is sample data from the API.'}
-    return jsonify(data)
+    if sensor == "dht22":
+        temp, humidity = dht22.read_value()
+        return jsonify({"value": {
+            "temperature": temp,
+            "humidity": humidity
+        }}), 200
+    elif sensor == "ec":
+        return jsonify({"value": ec.read_value()}), 200
+    elif sensor == "ph":
+        return jsonify({"value": ph.read_value()}), 200
+    elif sensor == "light":
+        return jsonify({"value": light.read_value()}), 200
+    elif sensor == "water-level":
+        return jsonify({"value": waterLevel.read_value()}), 200
+    elif sensor == "water-temperature":
+        return jsonify({"value": waterTemp.read_value()}), 200
+    return jsonify({'error': 'Invalid sensor'}), 400
 
 @app.route('/limit', methods=['GET']) # Retorna a lista de limites
 def get_limits():
     return jsonify(limitService.limits), 200
 
-@app.route('/limit/<value>', methods=['GET', 'POST']) # Retorna o valor do limite passado | Seta valor do limite passado, como receber body?
+@app.route('/limit/<value>', methods=['GET', 'PUT']) # Retorna o valor do limite passado | Seta valor do limite passado
 def get_limit(value):
     if request.method == 'GET':
         return jsonify({'value': limitService.get_limit(value)})
-    elif request.method == 'POST':
+    elif request.method == 'PUT':
         data = request.get_json()
         if data:
             limitService.set_limit(data["name"], data["value"])
@@ -69,38 +89,41 @@ def get_limit(value):
         else:
             return jsonify({'error': 'Invalid JSON data'}), 400
 
-@app.route('/light/schedule', methods=['GET', 'PUT', 'POST', 'DELETE']) # Altera horario existente | Adiciona horario novo
+@app.route('/light/schedule', methods=['GET', 'POST']) # Altera horario existente | Adiciona horario novo
 def light_schedule():
     if request.method == 'GET':
         return jsonify(lightService.schedule)
-    elif request.method == 'PUT':
-        data = request.get_json()
-        lightService.update_schedule(data['id'], data['hour'], data['minute'], data['state'])
-        return jsonify({True}), 200
     elif request.method == 'POST':
         data = request.get_json()
         lightService.insert_schedule(data['hour'], data['minute'], data['state'])
         return jsonify({True}), 200
     
-@app.route('/light/schedule/<id>', methods=['GET', 'DELETE']) # pega horario existente | deleta horario existente
+@app.route('/light/schedule/<id>', methods=['PUT', 'DELETE']) # pega horario existente | deleta horario existente
 def light_schedule_id(id):
-    if request.method == 'GET':
-        return jsonify(lightService.schedule), 200 # como pega pelo id
+    if request.method == 'PUT':
+        data = request.get_json()
+        lightService.update_schedule(data['id'], data['hour'], data['minute'], data['state'])
+        return jsonify({True}), 200
     elif request.method == 'DELETE':
         lightService.delete_schedule(id)
         return jsonify({True}), 200
-
-@app.route('/actuator/relay/<name>', methods=['POST']) # Liga ou desliga relay passado
-def set_limit(name):
-    data = {'message': 'This is sample data from the API.'}
-    return jsonify(data)
 
 @app.route('/cam/<action>', methods=['GET']) # retorna foto/stream/timelapse da estufa
 def cam_endpoint(action):
     data = {'message': 'This is sample data from the API.'}
     return jsonify(data)
 
+@app.route('/change-password', methods=['POST']) # muda senha
+def login():
+    data = {'message': 'This is sample data from the API.'}
+    return jsonify(data)
+
 @app.route('/login', methods=['POST']) # faz login
+def login():
+    data = {'message': 'This is sample data from the API.'}
+    return jsonify(data)
+
+@app.route('/logout', methods=['POST']) # faz logout
 def login():
     data = {'message': 'This is sample data from the API.'}
     return jsonify(data)

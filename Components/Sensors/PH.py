@@ -1,4 +1,6 @@
 from Components.Sensors.Sensor import Sensor
 
 class PH(Sensor):
-    pass
+    def read_value(self):
+        print("Lendo sensor PH")
+        return 7.5

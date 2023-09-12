@@ -4,6 +4,15 @@ CREATE TABLE limit_value (
   value REAL
 );
 
+CREATE TABLE user (
+  username TEXT,
+  password TEXT
+);
+
+CREATE TABLE session (
+  jwt TEXT
+);
+
 CREATE TABLE light_schedule (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   hour INTEGER,
@@ -26,3 +35,6 @@ VALUES ('temperature_min', 25),
 INSERT INTO light_schedule (hour, minute, state)
 VALUES (8, 15, 1),
        (20, 30, 0);
+
+INSERT INTO user (username, password)
+VALUES ("admin", "1234");

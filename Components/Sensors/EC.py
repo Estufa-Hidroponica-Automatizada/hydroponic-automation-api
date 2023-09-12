@@ -1,4 +1,6 @@
 from Components.Sensors.Sensor import Sensor
 
 class EC(Sensor):
-    pass
+    def read_value(self):
+        print("Lendo sensor EC")
+        return 400
