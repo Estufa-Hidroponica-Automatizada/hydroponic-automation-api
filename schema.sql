@@ -4,13 +4,6 @@ CREATE TABLE limit_value (
   value REAL
 );
 
-CREATE TABLE measure (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT,
-  value REAL,
-  created_at TIMESTAMP
-);
-
 CREATE TABLE light_schedule (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   hour INTEGER,

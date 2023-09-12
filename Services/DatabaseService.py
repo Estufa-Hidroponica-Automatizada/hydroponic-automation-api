@@ -9,7 +9,7 @@ class DatabaseService():
         if not os.path.exists(database_name):
             self._initialize_database(schema_script)
         
-        self.conn = sqlite3.connect(database_name)
+        self.conn = sqlite3.connect(database_name, check_same_thread=False)
         self.cursor = self.conn.cursor()
 
     def _initialize_database(self, schema_script):
