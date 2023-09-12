@@ -114,7 +114,7 @@ def cam_endpoint(action):
     return jsonify(data)
 
 @app.route('/change-password', methods=['POST']) # muda senha
-def login():
+def changePassword():
     data = {'message': 'This is sample data from the API.'}
     return jsonify(data)
 
@@ -124,7 +124,7 @@ def login():
     return jsonify(data)
 
 @app.route('/logout', methods=['POST']) # faz logout
-def login():
+def logout():
     data = {'message': 'This is sample data from the API.'}
     return jsonify(data)
 
