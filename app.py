@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from Components.Sensors.DHT22 import dht22
 from Components.Sensors.EC import ec
 from Components.Sensors.Light import light
@@ -6,7 +7,6 @@ from Components.Sensors.PH import ph
 from Components.Sensors.WaterLevel import waterLevel
 from Components.Sensors.WaterTemp import waterTemp
 
-from Services.DatabaseService import databaseService
 from Services.LightService import lightService
 from Services.NutrientService import nutrientService
 from Services.LimitService import limitService
@@ -16,6 +16,7 @@ from flask_apscheduler import APScheduler
 
 
 app = Flask(__name__)
+CORS(app)
 scheduler = APScheduler()
 
 @app.route('/sensor', methods=['GET']) # Retorna todos os valores medidos nos sensores
@@ -26,7 +27,7 @@ def read_sensors():
         "humidity": humidity,
         "waterTemperature": waterTemp.read_value(),
         "pH": ph.read_value(),
-        "EC": ec.read_value(),
+        "condutivity": ec.read_value(),
         "waterLevel": waterLevel.read_value(),
         "light": light.read_value()
     }), 200
@@ -37,7 +38,7 @@ def read_sensor(sensor):
         return jsonify({"value": dht22.read_value()[0]}), 200
     elif sensor == "humidity":
         return jsonify({"value": dht22.read_value()[1]}), 200
-    elif sensor == "ec":
+    elif sensor == "condutivity":
         return jsonify({"value": ec.read_value()}), 200
     elif sensor == "ph":
         return jsonify({"value": ph.read_value()}), 200
@@ -51,12 +52,29 @@ def read_sensor(sensor):
 
 @app.route('/limit', methods=['GET']) # Retorna a lista de limites
 def get_limits():
-    return jsonify(limitService.limits), 200
+    data = {
+        "airTemperature": {'max': limitService.get_limit("temperature_max"), 'min': limitService.get_limit("temperature_min")},
+        "waterTemperature": {'max': limitService.get_limit("water_temperature_max"), 'min': limitService.get_limit("water_temperature_min")},
+        "humidity": {'max': limitService.get_limit("humidity_max"), 'min': limitService.get_limit("humidity_min")},
+        "pH": {'max': limitService.get_limit("ph_max"), 'min': limitService.get_limit("ph_min")},
+        "condutivity": {'max': limitService.get_limit("ec_max"), 'min': limitService.get_limit("ec_min")}
+    }
+    return jsonify(data), 200
 
 @app.route('/limit/<value>', methods=['GET', 'PUT']) # Retorna o valor do limite passado | Seta valor do limite passado
 def get_limit(value):
     if request.method == 'GET':
-        return jsonify({'value': limitService.get_limit(value)})
+        if value == "air-temperature":
+            return jsonify({'max': limitService.get_limit("temperature_max"), 'min': limitService.get_limit("temperature_min")}), 200
+        elif value == "humidity":
+            return jsonify({'max': limitService.get_limit("humidity_max"), 'min': limitService.get_limit("humidity_min")}), 200
+        elif value == "condutivity":
+            return jsonify({'max': limitService.get_limit("ec_max"), 'min': limitService.get_limit("ec_min")}), 200
+        elif value == "ph":
+            return jsonify({'max': limitService.get_limit("ph_max"), 'min': limitService.get_limit("ph_min")}), 200
+        elif value == "water-temperature":
+            return jsonify({'max': limitService.get_limit("water_temperature_max"), 'min': limitService.get_limit("water_temperature_min")}), 200
+        return jsonify({'error': 'Invalid limit'}), 400
     elif request.method == 'PUT':
         data = request.get_json()
         if data:
