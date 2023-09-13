@@ -24,7 +24,7 @@ def read_sensors():
     return jsonify({
         "airTemperature": temp,
         "humidity": humidity,
-        "waterTemperature": waterTemp.hydroponic-automation-apiread_value(),
+        "waterTemperature": waterTemp.read_value(),
         "pH": ph.read_value(),
         "EC": ec.read_value(),
         "waterLevel": waterLevel.read_value(),
@@ -72,26 +72,26 @@ def light_schedule():
     elif request.method == 'POST':
         data = request.get_json()
         lightService.insert_schedule(data['hour'], data['minute'], data['state'])
-        return jsonify({True}), 200
+        return jsonify({"result": True}), 200
     
 @app.route('/light/schedule/<id>', methods=['PUT', 'DELETE']) # pega horario existente | deleta horario existente
 def light_schedule_id(id):
     if request.method == 'PUT':
         data = request.get_json()
         lightService.update_schedule(id, data['hour'], data['minute'], data['state'])
-        return jsonify({True}), 200
+        return jsonify({"result": True}), 200
     elif request.method == 'DELETE':
         lightService.delete_schedule(id)
-        return jsonify({True}), 200
+        return jsonify({"result": True}), 200
     
 @app.route('/nutrient/proportion', methods=['GET', 'PUT']) # Pega e atualiza porporção de nutrientes
-def func_nutrients(self):
+def func_nutrients():
     if request.method == 'GET':
         return jsonify(nutrientService.nutrients)
     elif request.method == 'PUT':
         data = request.get_json()
         nutrientService.set_proportion(data['nutrientA'], data['nutrientB'])
-        return jsonify({True}), 200
+        return jsonify({"result": True}), 200
 
 @app.route('/cam/<action>', methods=['GET']) # retorna foto/stream/timelapse da estufa
 def cam_endpoint(action):
@@ -117,11 +117,7 @@ def logout():
 def maintain_greenhouse():
     greenhouseService.maintaince()
 
-@app.teardown_appcontext
-def cleanup_app_context(exception=None):
-    databaseService.close()
-
 if __name__ == '__main__':
     scheduler.init_app(app)
     scheduler.start()
-    app.run(debug=True, host='0.0.0.0', port='4000')
+    app.run(debug=True, host='0.0.0.0', port='5000')

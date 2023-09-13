@@ -51,7 +51,7 @@ class DatabaseService():
         return schedule
     
     def update_schedule(self, id, hour, minute, state):
-        self.cursor.execute('UPDATE light_schedule SET hour = ?, minute = ?, state, = ? WHERE id = ?', (hour, minute, state, id))
+        self.cursor.execute('UPDATE light_schedule SET hour = ?, minute = ?, state = ? WHERE id = ?', (hour, minute, state, id))
         self.conn.commit()
 
     def insert_schedule(self, hour, minute, state):
