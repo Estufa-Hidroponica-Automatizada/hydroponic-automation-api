@@ -53,11 +53,11 @@ def read_sensor(sensor):
 @app.route('/limit', methods=['GET']) # Retorna a lista de limites
 def get_limits():
     data = {
-        "airTemperature": {'max': limitService.get_limit("temperature_max"), 'min': limitService.get_limit("temperature_min")},
-        "waterTemperature": {'max': limitService.get_limit("water_temperature_max"), 'min': limitService.get_limit("water_temperature_min")},
-        "humidity": {'max': limitService.get_limit("humidity_max"), 'min': limitService.get_limit("humidity_min")},
-        "pH": {'max': limitService.get_limit("ph_max"), 'min': limitService.get_limit("ph_min")},
-        "condutivity": {'max': limitService.get_limit("ec_max"), 'min': limitService.get_limit("ec_min")}
+        "airTemperature": {'max': limitService.get_limit("temperature_max")[2], 'min': limitService.get_limit("temperature_min")[2]},
+        "waterTemperature": {'max': limitService.get_limit("water_temperature_max")[2], 'min': limitService.get_limit("water_temperature_min")[2]},
+        "humidity": {'max': limitService.get_limit("humidity_max")[2], 'min': limitService.get_limit("humidity_min")[2]},
+        "pH": {'max': limitService.get_limit("ph_max")[2], 'min': limitService.get_limit("ph_min")[2]},
+        "condutivity": {'max': limitService.get_limit("ec_max")[2], 'min': limitService.get_limit("ec_min")[2]}
     }
     return jsonify(data), 200
 
@@ -65,15 +65,15 @@ def get_limits():
 def get_limit(value):
     if request.method == 'GET':
         if value == "air-temperature":
-            return jsonify({'max': limitService.get_limit("temperature_max"), 'min': limitService.get_limit("temperature_min")}), 200
+            return jsonify({'max': limitService.get_limit("temperature_max")[2], 'min': limitService.get_limit("temperature_min")[2]}), 200
         elif value == "humidity":
-            return jsonify({'max': limitService.get_limit("humidity_max"), 'min': limitService.get_limit("humidity_min")}), 200
+            return jsonify({'max': limitService.get_limit("humidity_max")[2], 'min': limitService.get_limit("humidity_min")[2]}), 200
         elif value == "condutivity":
-            return jsonify({'max': limitService.get_limit("ec_max"), 'min': limitService.get_limit("ec_min")}), 200
+            return jsonify({'max': limitService.get_limit("ec_max")[2], 'min': limitService.get_limit("ec_min")[2]}), 200
         elif value == "ph":
-            return jsonify({'max': limitService.get_limit("ph_max"), 'min': limitService.get_limit("ph_min")}), 200
+            return jsonify({'max': limitService.get_limit("ph_max")[2], 'min': limitService.get_limit("ph_min")[2]}), 200
         elif value == "water-temperature":
-            return jsonify({'max': limitService.get_limit("water_temperature_max"), 'min': limitService.get_limit("water_temperature_min")}), 200
+            return jsonify({'max': limitService.get_limit("water_temperature_max")[2], 'min': limitService.get_limit("water_temperature_min")[2]}), 200
         return jsonify({'error': 'Invalid limit'}), 400
     elif request.method == 'PUT':
         data = request.get_json()
