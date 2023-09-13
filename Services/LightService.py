@@ -1,3 +1,4 @@
+import datetime
 from Services.DatabaseService import databaseService
 
 
@@ -21,6 +22,21 @@ class LightService():
         return True
     
     def isSupposedToBeOn(self):
-        return True # TODO
+        now = datetime.datetime.now()
+        current_hour, current_minute = now.hour, now.minute
+
+        latest_time = None
+        latest_state = None
+
+        for row in self.schedule:
+            id, hour, minute, state = row
+
+            time_diff = (current_hour - hour) * 60 + (current_minute - minute)
+
+            if time_diff >= 0 and (latest_time is None or time_diff < latest_time):
+                latest_time = time_diff
+                latest_state = state
+
+        return True if latest_state == 1 else False
 
 lightService = LightService()

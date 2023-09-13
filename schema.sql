@@ -9,6 +9,11 @@ CREATE TABLE user (
   password TEXT
 );
 
+CREATE TABLE nutrient_proportion (
+  nutrientA INTEGER,
+  nutrientB INTEGER
+);
+
 CREATE TABLE session (
   jwt TEXT
 );
@@ -38,3 +43,6 @@ VALUES (8, 15, 1),
 
 INSERT INTO user (username, password)
 VALUES ("admin", "1234");
+
+INSERT INTO nutrient_proportion (nutrientA, nutrientB)
+VALUES (3, 2);

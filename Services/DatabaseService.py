@@ -26,11 +26,20 @@ class DatabaseService():
         self.cursor.execute('SELECT * FROM limit_value')
         limit = self.cursor.fetchall()
         return limit
+    
+    def fetch_nutrient_proportion(self):
+        self.cursor.execute('SELECT * FROM nutrient_proportion')
+        nutrientProportion = self.cursor.fetchone()
+        return nutrientProportion
 
     def fetch_limit_value(self, name):
         self.cursor.execute('SELECT value FROM limit_value WHERE name = ?', (name))
         limit = self.cursor.fetchone()
         return limit
+    
+    def update_nutrient_proportion(self, nutrientAPorportion, nutrientBPorportion):
+        self.cursor.execute('UPDATE nutrient_proportion SET nutrientA = ?, nutrientB = ?', (nutrientAPorportion, nutrientBPorportion))
+        self.conn.commit()
     
     def update_limit_value(self, name, value):
         self.cursor.execute('UPDATE limit_value SET value = ? WHERE name = ?', (value, name))

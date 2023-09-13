@@ -7,6 +7,7 @@ from Components.Actuators.Relay import relays
 
 from Services.LightService import lightService
 from Services.LimitService import limitService
+from Services.NutrientService import nutrientService
 
 class GreenhouseService():
     def maintaince(self):
@@ -27,6 +28,15 @@ class GreenhouseService():
 
 
         print("----------------------ATUANDO-------------------------")
+        isSupposedToBeOn = lightService.isSupposedToBeOn()
+
+        if isSupposedToBeOn:
+            print("Ligando a luz")
+            relays["light"].turn_on()
+        else:
+            print("Desligando a luz")
+            relays["light"].turn_off()
+
         if phMeasure < limitService.get_limit("ph_min")[2]:
             print(f"Ph abaixo do mínimo - {phMeasure}")
             relays["pumpPhPlus"].turn_on_for(2)
@@ -35,11 +45,13 @@ class GreenhouseService():
             relays["pumpPhMinus"].turn_on_for(2)
 
         if ecMeasure < limitService.get_limit("ec_min")[2]:
-            print(f"EC abaixo do mínimo - {ecMeasure}")
-            relays["pumpNutrientA"].turn_on_for(2)
-            relays["pumpNutrientB"].turn_on_for(3) # TODO - Ver a proporcão que deve ser despejada, isso provavelmente vai acabar tendo que ir pro banco para ser alterado pelo usuário
+            print(f"EC abaixo do mínimo - {ecMeasure}ppm")
+            print(f"Ativando bomba A por {nutrientService.nutrients[0]} segundos")
+            relays["pumpNutrientA"].turn_on_for(nutrientService.nutrients[0])
+            print(f"Ativando bomba B por {nutrientService.nutrients[1]} segundos")
+            relays["pumpNutrientB"].turn_on_for(nutrientService.nutrients[1])
         elif ecMeasure > limitService.get_limit("ec_max")[2]:
-            print(f"EC acima do máximo - {ecMeasure}")
+            print(f"EC acima do máximo - {ecMeasure}ppm")
             pass # TODO - Alerta de troca de agua??
 
         if temperatureMeasure > limitService.get_limit("temperature_max")[2] or humidityMeasure > limitService.get_limit("humidity_max")[2]:
@@ -51,14 +63,7 @@ class GreenhouseService():
             relays["exaustor"].turn_off()
             relays["fan"].turn_off()
 
-        if lightService.isSupposedToBeOn():
-            print("Ligando a luz")
-            relays["light"].turn_on()
-        else:
-            print("Desligando a luz")
-            relays["light"].turn_off()
-
-        if light.read_value() == 0 and lightService.isSupposedToBeOn():
+        if light.read_value() == 0 and isSupposedToBeOn:
             print("Alerta - Luz está desligada indevidamente")
             pass # TODO - Lançar alerta de luz falha
 

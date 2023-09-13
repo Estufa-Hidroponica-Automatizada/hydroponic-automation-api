@@ -8,6 +8,7 @@ from Components.Sensors.WaterTemp import waterTemp
 
 from Services.DatabaseService import databaseService
 from Services.LightService import lightService
+from Services.NutrientService import nutrientService
 from Services.LimitService import limitService
 from Services.GreenhouseService import greenhouseService
 
@@ -23,7 +24,7 @@ def read_sensors():
     return jsonify({
         "airTemperature": temp,
         "humidity": humidity,
-        "waterTemperature": waterTemp.read_value(),
+        "waterTemperature": waterTemp.hydroponic-automation-apiread_value(),
         "pH": ph.read_value(),
         "EC": ec.read_value(),
         "waterLevel": waterLevel.read_value(),
@@ -59,7 +60,7 @@ def get_limit(value):
     elif request.method == 'PUT':
         data = request.get_json()
         if data:
-            limitService.set_limit(data["name"], data["value"])
+            limitService.set_limit(value, data["value"])
             return jsonify({"result": True}), 200
         else:
             return jsonify({'error': 'Invalid JSON data'}), 400
@@ -77,10 +78,19 @@ def light_schedule():
 def light_schedule_id(id):
     if request.method == 'PUT':
         data = request.get_json()
-        lightService.update_schedule(data['id'], data['hour'], data['minute'], data['state'])
+        lightService.update_schedule(id, data['hour'], data['minute'], data['state'])
         return jsonify({True}), 200
     elif request.method == 'DELETE':
         lightService.delete_schedule(id)
+        return jsonify({True}), 200
+    
+@app.route('/nutrient/proportion', methods=['GET', 'PUT']) # Pega e atualiza porporção de nutrientes
+def func_nutrients(self):
+    if request.method == 'GET':
+        return jsonify(nutrientService.nutrients)
+    elif request.method == 'PUT':
+        data = request.get_json()
+        nutrientService.set_proportion(data['nutrientA'], data['nutrientB'])
         return jsonify({True}), 200
 
 @app.route('/cam/<action>', methods=['GET']) # retorna foto/stream/timelapse da estufa
@@ -114,4 +124,4 @@ def cleanup_app_context(exception=None):
 if __name__ == '__main__':
     scheduler.init_app(app)
     scheduler.start()
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port='4000')
