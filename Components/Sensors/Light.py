@@ -4,3 +4,5 @@ class Light(Sensor):
     def read_value(self):
         print("Lendo sensor Light")
         return 1
+    
+light = Light(3)

@@ -13,3 +13,13 @@ class Relay():
 
     def get_state(self):
         pass
+
+relays = {
+    "light": Relay(7),
+    "fan": Relay(8),
+    "exaustor": Relay(9),
+    "pumpPhPlus": Relay(10),
+    "pumpPhMinus": Relay(11),
+    "pumpNutrientA": Relay(12),
+    "pumpNutrientB": Relay(13),
+}

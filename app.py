@@ -1,44 +1,21 @@
 from flask import Flask, jsonify, request
-from Components.Actuators.Relay import Relay
-from Components.Sensors.DHT22 import DHT22
-from Components.Sensors.EC import EC
-from Components.Sensors.Light import Light
-from Components.Sensors.PH import PH
-from Components.Sensors.WaterLevel import WaterLevel
-from Components.Sensors.WaterTemp import WaterTemp
-from Services.AirControlService import AirControlService
+from Components.Sensors.DHT22 import dht22
+from Components.Sensors.EC import ec
+from Components.Sensors.Light import light
+from Components.Sensors.PH import ph
+from Components.Sensors.WaterLevel import waterLevel
+from Components.Sensors.WaterTemp import waterTemp
 
-from Services.DatabaseService import DatabaseService
-from Services.LightService import LightService
-from Services.LimitService import LimitService
-from Services.WaterService import WaterService
+from Services.DatabaseService import databaseService
+from Services.LightService import lightService
+from Services.LimitService import limitService
+from Services.GreenhouseService import greenhouseService
 
 from flask_apscheduler import APScheduler
 
 
 app = Flask(__name__)
 scheduler = APScheduler()
-
-dht22 = DHT22(1)
-ec = EC(2)
-light = Light(3)
-ph = PH(4)
-waterLevel = WaterLevel(5)
-waterTemp = WaterTemp(6)
-relays = {
-    "light": Relay(7),
-    "fan": Relay(8),
-    "exaustor": Relay(9),
-    "pumpPhPlus": Relay(10),
-    "pumpPhMinus": Relay(11),
-    "pumpNutrientA": Relay(12),
-    "pumpNutrientB": Relay(13),
-}
-databaseService = DatabaseService()
-limitService = LimitService(databaseService)
-airControlService = AirControlService(dht22, relays, databaseService, limitService)
-waterService = WaterService(ec, ph, waterLevel, waterTemp, relays, databaseService, limitService)
-lightService = LightService(light, relays, databaseService)
 
 @app.route('/sensor', methods=['GET']) # Retorna todos os valores medidos nos sensores
 def read_sensors():
@@ -55,12 +32,10 @@ def read_sensors():
 
 @app.route('/sensor/<sensor>', methods=['GET']) # Retorna o valor medido no sensor passado
 def read_sensor(sensor):
-    if sensor == "dht22":
-        temp, humidity = dht22.read_value()
-        return jsonify({"value": {
-            "temperature": temp,
-            "humidity": humidity
-        }}), 200
+    if sensor == "air-temperature":
+        return jsonify({"value": dht22.read_value()[0]}), 200
+    elif sensor == "humidity":
+        return jsonify({"value": dht22.read_value()[1]}), 200
     elif sensor == "ec":
         return jsonify({"value": ec.read_value()}), 200
     elif sensor == "ph":
@@ -128,11 +103,9 @@ def logout():
     data = {'message': 'This is sample data from the API.'}
     return jsonify(data)
 
-@scheduler.task('interval', id='monitoring', seconds=10)
+@scheduler.task('interval', id='monitoring', seconds=120)
 def maintain_greenhouse():
-    # Ler todos os sensores
-    # Aplicar todos os atuadores necessários
-    print('This job is executed every 10 seconds.')
+    greenhouseService.maintaince()
 
 @app.teardown_appcontext
 def cleanup_app_context(exception=None):
@@ -141,4 +114,4 @@ def cleanup_app_context(exception=None):
 if __name__ == '__main__':
     scheduler.init_app(app)
     scheduler.start()
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port='4000')
