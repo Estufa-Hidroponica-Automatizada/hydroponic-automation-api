@@ -114,4 +114,4 @@ def cleanup_app_context(exception=None):
 if __name__ == '__main__':
     scheduler.init_app(app)
     scheduler.start()
-    app.run(debug=True, host='0.0.0.0', port='4000')
+    app.run(debug=True, host='0.0.0.0')
