@@ -1,4 +1,7 @@
-from flask import Flask, jsonify, request
+import datetime
+import io
+import time
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from Components.Sensors.DHT22 import dht22
 from Components.Sensors.EC import ec
@@ -6,11 +9,13 @@ from Components.Sensors.Light import light
 from Components.Sensors.PH import ph
 from Components.Sensors.WaterLevel import waterLevel
 from Components.Sensors.WaterTemp import waterTemp
+from Components.Actuators.Relay import relays
 
 from Services.LightService import lightService
 from Services.NutrientService import nutrientService
 from Services.LimitService import limitService
 from Services.GreenhouseService import greenhouseService
+from Services.WebcamService import webcamService
 
 from flask_apscheduler import APScheduler
 
@@ -113,9 +118,22 @@ def func_nutrients():
 
 @app.route('/cam/<action>', methods=['GET']) # retorna foto/stream/timelapse da estufa
 def cam_endpoint(action):
-    data = {'message': 'This is sample data from the API.'}
-    return jsonify(data)
+    if action == 'photo':
+        photo_bytes = webcamService.get_photo()
+        return send_file(io.BytesIO(photo_bytes),
+                         mimetype='image/jpeg',
+                         as_attachment=True,
+                         download_name='photo.jpg')
 
+    elif action == 'timelapse':
+        video_bytes = webcamService.get_timelapse()
+        return send_file(io.BytesIO(video_bytes),
+                         mimetype='video/mp4',
+                         as_attachment=True,
+                         download_name='timelapse.mp4')
+
+    else:
+        return "Invalid action. Use 'photo' or 'timelapse'", 400
 @app.route('/change-password', methods=['POST']) # muda senha
 def changePassword():
     data = {'message': 'This is sample data from the API.'}
@@ -134,6 +152,21 @@ def logout():
 @scheduler.task('interval', id='monitoring', seconds=120)
 def maintain_greenhouse():
     greenhouseService.maintaince()
+
+@scheduler.task('interval', id='monitoring', seconds=86400) # 1 vez ao dia
+def get_photo():
+    lightInitialState = relays["light"].get_state()
+    if lightInitialState == "OFF":
+        relays["light"].turn_on()
+        time.sleep(1)
+    
+    photo_bytes = webcamService.get_photo()
+    photoName = str((time.time() * 1000))
+    with open(f"./photos/{photoName}.jpg", "wb") as f:
+        f.write(photo_bytes)
+    
+    if lightInitialState == "OFF": 
+        relays["light"].turn_off()
 
 if __name__ == '__main__':
     scheduler.init_app(app)
