@@ -153,12 +153,13 @@ def logout():
 def maintain_greenhouse():
     greenhouseService.maintaince()
 
-@scheduler.task('interval', id='monitoring', seconds=86400) # 1 vez ao dia
+@scheduler.task('interval', id='monitoring', seconds=1800) # 86400 1 vez ao dia
 def get_photo():
+    print("Fotografando ambiente")
     lightInitialState = relays["light"].get_state()
     if lightInitialState == "OFF":
         relays["light"].turn_on()
-        time.sleep(1)
+        time.sleep(0.5)
     
     photo_bytes = webcamService.get_photo()
     photoName = str((time.time() * 1000))
