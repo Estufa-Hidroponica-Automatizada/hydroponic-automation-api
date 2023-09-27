@@ -11,6 +11,9 @@ class WaterLevel(Sensor):
         print("Reading Water Level sensor")
         # Read the binary signal (1 for good level, 0 for low level)
         value = self.sensor.value
-        return value
+        if value is not None:
+            return value
+        else:
+            return -1
     
 waterLevel = WaterLevel(5)

@@ -1,10 +1,12 @@
 import sqlite3
 import os
+from flask_bcrypt import Bcrypt
 
 class DatabaseService():
 
     def __init__(self, database_name='database.db', schema_script='schema.sql'):
         self.database_name = database_name
+        self.bcrypt = Bcrypt()
 
         if not os.path.exists(database_name):
             self._initialize_database(schema_script)
@@ -20,6 +22,8 @@ class DatabaseService():
             self.conn = sqlite3.connect(self.database_name)
             self.cursor = self.conn.cursor()
             self.cursor.executescript(schema_sql)
+            hashed_password = self.bcrypt.generate_password_hash("1234").decode("utf-8")
+            self.cursor.execute('INSERT INTO user (username, password) VALUES (?, ?)', ("user", hashed_password))
             self.conn.commit()
 
     def fetch_limits(self):
@@ -62,7 +66,57 @@ class DatabaseService():
         self.cursor.execute('DELETE FROM light_schedule WHERE id = ?', (id))
         self.conn.commit()
 
+    def delete_all_schedule(self):
+        self.cursor.execute('DELETE FROM light_schedule')
+        self.conn.commit()
+    
+    def get_perfils(self):
+        self.cursor.execute('SELECT * FROM perfil')
+        perfils = self.cursor.fetchall()
+        return perfils
+
+    def get_perfil(self, id):
+        self.cursor.execute('SELECT * FROM perfil WHERE id = ?', (id,))
+        perfil = self.cursor.fetchone()
+        return perfil
+    
+    def get_user_info(self):
+        self.cursor.execute('SELECT * FROM user')
+        perfil = self.cursor.fetchone()
+        return {'username': perfil[0], "password": perfil[1]}
+    
+    def set_new_password(self, new_password):
+        hashed_password = self.bcrypt.generate_password_hash(new_password).decode('utf-8')
+        self.cursor.execute('UPDATE user SET password = ?', (hashed_password,))
+        self.conn.commit()
+
+    def post_perfil(self, name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion):
+        self.cursor.execute('INSERT INTO perfil (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion))
+        self.conn.commit()
+
+    def put_perfil(self, id, name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion):
+        self.cursor.execute('UPDATE perfil SET name = ?, temperature_min = ?, temperature_max = ?, humidity_min = ?, humidity_max = ?, ph_min = ?, ph_max = ?, ec_min = ?, ec_max = ?, water_temperature_min = ?, water_temperature_max = ?, light_schedule = ?, nutrient_proportion =? WHERE id = ?', (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion, id))
+        self.conn.commit()
+
+    def delete_perfil(self, id):
+        self.cursor.execute('DELETE FROM perfil WHERE id = ?', (id,))
+        self.conn.commit()
+
+    def get_perfil_atual(self):
+        self.cursor.execute('SELECT * FROM perfil_atual')
+        perfil = self.cursor.fetchone()
+        return perfil
+
+    def post_perfil_atual(self, id, dias=0):
+        self.cursor.execute('UPDATE perfil_atual SET id_selected = ?, days_passed = ?', (id, dias))
+        self.conn.commit()
+
+    def add_day_perfil_atual(self):
+        self.cursor.execute('UPDATE perfil_atual SET days_passed = ((SELECT days_passed FROM perfil_atual) + 1)')
+        self.conn.commit()
+
     def close(self):
         self.conn.close()
+
 
 databaseService = DatabaseService()

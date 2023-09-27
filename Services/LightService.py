@@ -21,6 +21,11 @@ class LightService():
         self.schedule = databaseService.fetch_light_schedule()
         return True
     
+    def delete_all_schedule(self):
+        databaseService.delete_all_schedule()
+        self.schedule = databaseService.fetch_light_schedule()
+        return True
+    
     def isSupposedToBeOn(self):
         now = datetime.datetime.now()
         current_hour, current_minute = now.hour, now.minute

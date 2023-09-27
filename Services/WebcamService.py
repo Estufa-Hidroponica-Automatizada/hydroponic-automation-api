@@ -2,6 +2,7 @@ import io
 import time
 import cv2
 import os
+from Components.Actuators.Relay import relays
 
 class WebcamService:
     def get_photo(self) -> bytes:
@@ -10,6 +11,9 @@ class WebcamService:
         ret, frame = cap.read()
 
         cap.release()
+
+        if not ret:
+            return None
 
         _, photo_bytes = cv2.imencode(".jpg", frame)
 
@@ -49,5 +53,21 @@ class WebcamService:
 
         # Return the video data as bytes
         return video_data
+    
+    def get_save_photo(self):
+        print("Fotografando ambiente")
+        lightInitialState = relays["light"].get_state()
+        if lightInitialState == "OFF":
+            relays["light"].turn_on()
+            time.sleep(0.5)
+        
+        photo_bytes = self.get_photo()
+        if photo_bytes:
+            photoName = str((time.time() * 1000)).replace(".", "")
+            with open(f"./photos/{photoName}.jpg", "wb") as f:
+                f.write(photo_bytes)
+        
+        if lightInitialState == "OFF": 
+            relays["light"].turn_off()
 
 webcamService = WebcamService()

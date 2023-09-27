@@ -1,8 +1,7 @@
-import datetime
 import io
-import time
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
+from flask_bcrypt import Bcrypt
 from Components.Sensors.DHT22 import dht22
 from Components.Sensors.EC import ec
 from Components.Sensors.Light import light
@@ -16,13 +15,21 @@ from Services.NutrientService import nutrientService
 from Services.LimitService import limitService
 from Services.GreenhouseService import greenhouseService
 from Services.WebcamService import webcamService
+from Services.PerfilService import perfilService
+from Services.DatabaseService import databaseService
 
 from flask_apscheduler import APScheduler
-
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, unset_jwt_cookies
 
 app = Flask(__name__)
 CORS(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 scheduler = APScheduler()
+
+app.config['JWT_SECRET_KEY'] = 'seu_segredo_super_secreto'
+app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False 
 
 @app.route('/sensor', methods=['GET']) # Retorna todos os valores medidos nos sensores
 def read_sensors():
@@ -120,6 +127,7 @@ def func_nutrients():
 def cam_endpoint(action):
     if action == 'photo':
         photo_bytes = webcamService.get_photo()
+        if not photo_bytes: return jsonify({"result": False}), 500
         return send_file(io.BytesIO(photo_bytes),
                          mimetype='image/jpeg',
                          as_attachment=True,
@@ -134,40 +142,81 @@ def cam_endpoint(action):
 
     else:
         return "Invalid action. Use 'photo' or 'timelapse'", 400
+
 @app.route('/change-password', methods=['POST']) # muda senha
+@jwt_required()
 def changePassword():
-    data = {'message': 'This is sample data from the API.'}
-    return jsonify(data)
+    data = request.get_json()
+    password = data.get('new_password')
+    databaseService.set_new_password(password)
+    return jsonify({"result": True}), 200
 
 @app.route('/login', methods=['POST']) # faz login
 def login():
-    data = {'message': 'This is sample data from the API.'}
-    return jsonify(data)
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    user_data = databaseService.get_user_info()
+
+    if username == user_data['username'] and bcrypt.check_password_hash(user_data['password'], password):
+        access_token = create_access_token(user_data['username'])
+        resp = make_response(jsonify({'message': 'Login successful!'}))
+        unset_jwt_cookies(resp)
+        resp.set_cookie('access_token_cookie', access_token, httponly=True, secure=False)
+        return resp, 200
+    else:
+        return jsonify({'message': 'Credenciais inválidas'}), 401
 
 @app.route('/logout', methods=['POST']) # faz logout
 def logout():
-    data = {'message': 'This is sample data from the API.'}
-    return jsonify(data)
+    resp = make_response(jsonify({'message': 'Logout bem-sucedido!'}))
+    unset_jwt_cookies(resp)
+    return resp, 200
 
-@scheduler.task('interval', id='monitoring', seconds=120)
+@app.route('/perfil', methods=['GET', 'POST'])
+def get_perfis():
+    if request.method == 'GET':
+        perfis = []
+        for perfil in perfilService.perfils:
+            perfis.append(perfilService.build_perfil_object(perfil))
+        return jsonify(perfis), 200
+    elif request.method == 'POST':
+        data = request.get_json()
+        perfilService.insert_perfil(data['name'], data['temperature_min'], data['temperature_max'], data['humidity_min'], data['humidity_max'], data['ph_min'], data['ph_max'], data['ec_min'], data['ec_max'], data['water_temperature_min'], data['water_temperature_max'], data['light_schedule'], data['nutrient_proportion'])
+        return jsonify({"result": True}), 200
+
+@app.route('/perfil/<id>', methods=['GET', 'DELETE', 'PUT'])
+def action_perfil(id):
+    if request.method == 'PUT':
+        data = request.get_json()
+        perfilService.update_perfil(id, data['name'], data['temperature_min'], data['temperature_max'], data['humidity_min'], data['humidity_max'], data['ph_min'], data['ph_max'], data['ec_min'], data['ec_max'], data['water_temperature_min'], data['water_temperature_max'], data['light_schedule'], data['nutrient_proportion'])
+        result = perfilService.set_perfil_atual(data['id'], data['days'])
+        return jsonify({"result": result}), (200 if result else 400)
+    elif request.method == 'DELETE':
+        perfilService.delete_perfil(id)
+        return jsonify({"result": True}), 200
+    elif request.method == 'GET':
+        return jsonify(perfilService.build_perfil_object(perfilService.get_perfil(id))), 200
+
+@app.route('/perfil/atual', methods=['GET', 'POST'])
+def ongoing_perfil():
+    if request.method == 'POST':
+        data = request.get_json()
+        perfilService.set_perfil_atual(data['id'], data['days'])
+        perfilService.update_limits_for_days_by_perfil()
+        return jsonify({"result": True}), 200
+    elif request.method == 'GET':
+        return jsonify(perfilService.build_perfil_atual_object(perfilService.perfil_atual)), 200
+
+@scheduler.task('interval', id='monitoring', seconds=600)
 def maintain_greenhouse():
     greenhouseService.maintaince()
 
-@scheduler.task('interval', id='monitoring', seconds=1800) # 86400 1 vez ao dia
-def get_photo():
-    print("Fotografando ambiente")
-    lightInitialState = relays["light"].get_state()
-    if lightInitialState == "OFF":
-        relays["light"].turn_on()
-        time.sleep(0.5)
-    
-    photo_bytes = webcamService.get_photo()
-    photoName = str((time.time() * 1000))
-    with open(f"./photos/{photoName}.jpg", "wb") as f:
-        f.write(photo_bytes)
-    
-    if lightInitialState == "OFF": 
-        relays["light"].turn_off()
+@scheduler.task('interval', id='updating', seconds=10000) # 86400 1 vez ao dia
+def daily_update():
+    webcamService.get_save_photo()
+    perfilService.add_day()
+    perfilService.update_limits_for_days_by_perfil()
 
 if __name__ == '__main__':
     scheduler.init_app(app)
