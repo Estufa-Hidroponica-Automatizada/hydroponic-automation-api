@@ -59,11 +59,11 @@ class GreenhouseService():
         if temperatureMeasure > -1:
             if temperatureMeasure > limitService.get_limit("temperature_max")[2] or humidityMeasure > limitService.get_limit("humidity_max")[2]:
                 print(f"Temperatura e/ou humidade fora da faixa - {temperatureMeasure}ºC | {humidityMeasure}%")
-                relays["exaustor"].turn_on()
+                relays["exhaustor"].turn_on()
                 relays["fan"].turn_on()
             else:
                 print(f"Desligando exaustor e ventilador - {temperatureMeasure}ºC | {humidityMeasure}%")
-                relays["exaustor"].turn_off()
+                relays["exhaustor"].turn_off()
                 relays["fan"].turn_off()
 
         if light.read_value() == 0 and isSupposedToBeOn:

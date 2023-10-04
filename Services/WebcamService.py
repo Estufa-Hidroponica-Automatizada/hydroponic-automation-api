@@ -70,4 +70,6 @@ class WebcamService:
         if lightInitialState == "OFF": 
             relays["light"].turn_off()
 
+        return photo_bytes
+
 webcamService = WebcamService()

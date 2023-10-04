@@ -22,16 +22,19 @@ from flask_apscheduler import APScheduler
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, unset_jwt_cookies
 
 app = Flask(__name__)
-CORS(app)
+CORS(app,supports_credentials=True)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
 
 app.config['JWT_SECRET_KEY'] = 'seu_segredo_super_secreto'
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False 
 
 @app.route('/sensor', methods=['GET']) # Retorna todos os valores medidos nos sensores
+@jwt_required()
 def read_sensors():
     temp, humidity = dht22.read_value()
     return jsonify({
@@ -45,6 +48,7 @@ def read_sensors():
     }), 200
 
 @app.route('/sensor/<sensor>', methods=['GET']) # Retorna o valor medido no sensor passado
+@jwt_required()
 def read_sensor(sensor):
     if sensor == "air-temperature":
         return jsonify({"value": dht22.read_value()[0]}), 200
@@ -63,6 +67,7 @@ def read_sensor(sensor):
     return jsonify({'error': 'Invalid sensor'}), 400
 
 @app.route('/limit', methods=['GET']) # Retorna a lista de limites
+@jwt_required()
 def get_limits():
     data = {
         "airTemperature": {'max': limitService.get_limit("temperature_max")[2], 'min': limitService.get_limit("temperature_min")[2]},
@@ -74,6 +79,7 @@ def get_limits():
     return jsonify(data), 200
 
 @app.route('/limit/<value>', methods=['GET', 'PUT']) # Retorna o valor do limite passado | Seta valor do limite passado
+@jwt_required()
 def get_limit(value):
     if request.method == 'GET':
         if value == "air-temperature":
@@ -96,6 +102,7 @@ def get_limit(value):
             return jsonify({'error': 'Invalid JSON data'}), 400
 
 @app.route('/light/schedule', methods=['GET', 'POST']) # Altera horario existente | Adiciona horario novo
+@jwt_required()
 def light_schedule():
     if request.method == 'GET':
         return jsonify(lightService.schedule)
@@ -105,6 +112,7 @@ def light_schedule():
         return jsonify({"result": True}), 200
     
 @app.route('/light/schedule/<id>', methods=['PUT', 'DELETE']) # pega horario existente | deleta horario existente
+@jwt_required()
 def light_schedule_id(id):
     if request.method == 'PUT':
         data = request.get_json()
@@ -115,6 +123,7 @@ def light_schedule_id(id):
         return jsonify({"result": True}), 200
     
 @app.route('/nutrient/proportion', methods=['GET', 'PUT']) # Pega e atualiza porporção de nutrientes
+@jwt_required()
 def func_nutrients():
     if request.method == 'GET':
         return jsonify(nutrientService.nutrients)
@@ -124,9 +133,10 @@ def func_nutrients():
         return jsonify({"result": True}), 200
 
 @app.route('/cam/<action>', methods=['GET']) # retorna foto/stream/timelapse da estufa
+@jwt_required()
 def cam_endpoint(action):
     if action == 'photo':
-        photo_bytes = webcamService.get_photo()
+        photo_bytes = webcamService.get_save_photo()
         if not photo_bytes: return jsonify({"result": False}), 500
         return send_file(io.BytesIO(photo_bytes),
                          mimetype='image/jpeg',
@@ -147,9 +157,15 @@ def cam_endpoint(action):
 @jwt_required()
 def changePassword():
     data = request.get_json()
-    password = data.get('new_password')
-    databaseService.set_new_password(password)
-    return jsonify({"result": True}), 200
+    old_password = data.get('oldPassword')
+    new_password = data.get('newPassword')
+    user_data = databaseService.get_user_info()
+    if bcrypt.check_password_hash(user_data['password'], old_password):
+        databaseService.set_new_password(new_password)
+        return jsonify({"result": True}), 200
+    else:
+        return jsonify({'message': 'Senha atual incorreta'}), 401
+
 
 @app.route('/login', methods=['POST']) # faz login
 def login():
@@ -162,18 +178,20 @@ def login():
         access_token = create_access_token(user_data['username'])
         resp = make_response(jsonify({'message': 'Login successful!'}))
         unset_jwt_cookies(resp)
-        resp.set_cookie('access_token_cookie', access_token, httponly=True, secure=False)
+        resp.set_cookie('access_token_cookie', access_token, httponly=True, secure=True, samesite='None')
         return resp, 200
     else:
         return jsonify({'message': 'Credenciais inválidas'}), 401
 
 @app.route('/logout', methods=['POST']) # faz logout
+@jwt_required()
 def logout():
     resp = make_response(jsonify({'message': 'Logout bem-sucedido!'}))
     unset_jwt_cookies(resp)
     return resp, 200
 
 @app.route('/perfil', methods=['GET', 'POST'])
+@jwt_required()
 def get_perfis():
     if request.method == 'GET':
         perfis = []
@@ -186,12 +204,13 @@ def get_perfis():
         return jsonify({"result": True}), 200
 
 @app.route('/perfil/<id>', methods=['GET', 'DELETE', 'PUT'])
+@jwt_required()
 def action_perfil(id):
     if request.method == 'PUT':
         data = request.get_json()
         perfilService.update_perfil(id, data['name'], data['temperature_min'], data['temperature_max'], data['humidity_min'], data['humidity_max'], data['ph_min'], data['ph_max'], data['ec_min'], data['ec_max'], data['water_temperature_min'], data['water_temperature_max'], data['light_schedule'], data['nutrient_proportion'])
-        result = perfilService.set_perfil_atual(data['id'], data['days'])
-        return jsonify({"result": result}), (200 if result else 400)
+        perfilService.update_limits_for_days_by_perfil()
+        return jsonify({"result": True}), 200
     elif request.method == 'DELETE':
         perfilService.delete_perfil(id)
         return jsonify({"result": True}), 200
@@ -199,6 +218,7 @@ def action_perfil(id):
         return jsonify(perfilService.build_perfil_object(perfilService.get_perfil(id))), 200
 
 @app.route('/perfil/atual', methods=['GET', 'POST'])
+@jwt_required()
 def ongoing_perfil():
     if request.method == 'POST':
         data = request.get_json()
@@ -212,13 +232,11 @@ def ongoing_perfil():
 def maintain_greenhouse():
     greenhouseService.maintaince()
 
-@scheduler.task('interval', id='updating', seconds=10000) # 86400 1 vez ao dia
+@scheduler.task('interval', id='updating', seconds=3600) # 86400 1 vez ao dia
 def daily_update():
     webcamService.get_save_photo()
     perfilService.add_day()
     perfilService.update_limits_for_days_by_perfil()
 
 if __name__ == '__main__':
-    scheduler.init_app(app)
-    scheduler.start()
     app.run(debug=True, host='0.0.0.0', port='3000')

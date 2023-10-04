@@ -11,12 +11,12 @@ class PerfilService():
         self.perfil_atual = databaseService.get_perfil_atual()
     
     def update_perfil(self, id, name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion):
-        databaseService.put_perfil(id, name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion)
+        databaseService.put_perfil(id, name, str(temperature_min), str(temperature_max), str(humidity_min), str(humidity_max), str(ph_min), str(ph_max), str(ec_min), str(ec_max), str(water_temperature_min), str(water_temperature_max), str(light_schedule), str(nutrient_proportion))
         self.perfils = databaseService.get_perfils()
         return True
     
     def insert_perfil(self, name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion):
-        databaseService.post_perfil(name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion)
+        databaseService.post_perfil(name, str(temperature_min), str(temperature_max), str(humidity_min), str(humidity_max), str(ph_min), str(ph_max), str(ec_min), str(ec_max), str(water_temperature_min), str(water_temperature_max), str(light_schedule), str(nutrient_proportion))
         self.perfils = databaseService.get_perfils()
         return True
     
@@ -51,20 +51,20 @@ class PerfilService():
         print(f"perfil: {perfil_atual}")
         week = perfilService.perfil_atual[1] // 7
         print(f"semana: {week}")
-        if week > len(perfil_atual[2].split(',')):
+        if week >= len(ast.literal_eval(perfil_atual[2])):
             print("Plantio finalizado")
             return
         #setar limites
-        limitService.set_limit('temperature_min', perfil_atual[2].split(',')[week])
-        limitService.set_limit('temperature_max', perfil_atual[3].split(',')[week])
-        limitService.set_limit('humidity_min', perfil_atual[4].split(',')[week])
-        limitService.set_limit('humidity_max', perfil_atual[5].split(',')[week])
-        limitService.set_limit('ph_min', perfil_atual[6].split(',')[week])
-        limitService.set_limit('ph_max', perfil_atual[7].split(',')[week])
-        limitService.set_limit('ec_min', perfil_atual[8].split(',')[week])
-        limitService.set_limit('ec_max', perfil_atual[9].split(',')[week])
-        limitService.set_limit('water_temperature_min', perfil_atual[10].split(',')[week])
-        limitService.set_limit('water_temperature_max', perfil_atual[11].split(',')[week])
+        limitService.set_limit('temperature_min', ast.literal_eval(perfil_atual[2])[week])
+        limitService.set_limit('temperature_max', ast.literal_eval(perfil_atual[3])[week])
+        limitService.set_limit('humidity_min', ast.literal_eval(perfil_atual[4])[week])
+        limitService.set_limit('humidity_max', ast.literal_eval(perfil_atual[5])[week])
+        limitService.set_limit('ph_min', ast.literal_eval(perfil_atual[6])[week])
+        limitService.set_limit('ph_max', ast.literal_eval(perfil_atual[7])[week])
+        limitService.set_limit('ec_min', ast.literal_eval(perfil_atual[8])[week])
+        limitService.set_limit('ec_max', ast.literal_eval(perfil_atual[9])[week])
+        limitService.set_limit('water_temperature_min', ast.literal_eval(perfil_atual[10])[week])
+        limitService.set_limit('water_temperature_max', ast.literal_eval(perfil_atual[11])[week])
         #setar lightschedule
         lightService.delete_all_schedule()
         schedule_list = ast.literal_eval(perfil_atual[12])
@@ -80,18 +80,18 @@ class PerfilService():
         return {
             "id": perfil_list[0],
             "name": perfil_list[1],
-            "temperature_min":  perfil_list[2],
-            "temperature_max":  perfil_list[3],
-            "humidity_min":  perfil_list[4],
-            "humidity_max":  perfil_list[5],
-            "ph_min":  perfil_list[6],
-            "ph_max":  perfil_list[7],
-            "ec_min":  perfil_list[8],
-            "ec_max":  perfil_list[9],
-            "water_temperature_min":  perfil_list[10],
-            "water_temperature_max":  perfil_list[11],
-            "light_schedule":  perfil_list[12],
-            "nutrient_proportion":  perfil_list[13]
+            "temperature_min":  ast.literal_eval(perfil_list[2]),
+            "temperature_max":  ast.literal_eval(perfil_list[3]),
+            "humidity_min":  ast.literal_eval(perfil_list[4]),
+            "humidity_max":  ast.literal_eval(perfil_list[5]),
+            "ph_min":  ast.literal_eval(perfil_list[6]),
+            "ph_max":  ast.literal_eval(perfil_list[7]),
+            "ec_min":  ast.literal_eval(perfil_list[8]),
+            "ec_max":  ast.literal_eval(perfil_list[9]),
+            "water_temperature_min":  ast.literal_eval(perfil_list[10]),
+            "water_temperature_max":  ast.literal_eval(perfil_list[11]),
+            "light_schedule":  ast.literal_eval(perfil_list[12]),
+            "nutrient_proportion":  ast.literal_eval(perfil_list[13])
         }
 
     def build_perfil_atual_object(self, perfil_atual_list):

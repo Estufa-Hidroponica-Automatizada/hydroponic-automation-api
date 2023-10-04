@@ -1,19 +1,23 @@
-from gpiozero import DigitalInputDevice
+import RPi.GPIO as GPIO
 from Components.Sensors.Sensor import Sensor
 
 class WaterLevel(Sensor):
     def __init__(self, pin):
         super().__init__(pin)
-        # Create an instance of DigitalInputDevice to read the binary signal
-        self.sensor = DigitalInputDevice(self.pin)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     def read_value(self):
         print("Reading Water Level sensor")
-        # Read the binary signal (1 for good level, 0 for low level)
-        value = self.sensor.value
+        value = GPIO.input(self.pin)
         if value is not None:
-            return value
+            return 0 if value == 1 else 1
         else:
             return -1
     
-waterLevel = WaterLevel(5)
+waterLevel = WaterLevel(24)
+
+
+
+
+
