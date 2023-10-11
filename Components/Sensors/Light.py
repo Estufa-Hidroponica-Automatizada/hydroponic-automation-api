@@ -1,8 +1,10 @@
-from Components.Sensors.Sensor import Sensor
+from Components.Sensors.ArduinoSensor import arduinoSensor
 
-class Light(Sensor):
+class Light():
     def read_value(self):
-        print("Lendo sensor Light")
-        return 1
+        print("Reading Light sensor")
+        light_value = arduinoSensor.get_data_from_arduino()[0]
+        print(f"Light: {light_value}")
+        return int(light_value)
     
-light = Light(3)
+light = Light()

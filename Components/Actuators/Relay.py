@@ -4,8 +4,9 @@ import time
 class Relay():
     def __init__(self, pin):
         self.pin = pin
-        #GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BCM)
         #GPIO.setup(self.pin, GPIO.OUT)
+        #GPIO.output(self.pin, GPIO.LOW)
         self.state = GPIO.LOW
 
     def turn_on(self):
@@ -22,7 +23,7 @@ class Relay():
         self.state = GPIO.LOW
 
     def get_state(self):
-        return "ON" if self.state == GPIO.HIGH else "OFF"
+        return 1 if self.state == GPIO.HIGH else 0
 
 relays = {
     "light": Relay(7),

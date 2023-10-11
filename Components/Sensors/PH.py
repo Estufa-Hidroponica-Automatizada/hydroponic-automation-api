@@ -1,8 +1,10 @@
-from Components.Sensors.Sensor import Sensor
+from Components.Sensors.ArduinoSensor import arduinoSensor
 
-class PH(Sensor):
+class PH():
     def read_value(self):
-        print("Lendo sensor PH")
-        return 7.5
-
-ph = PH(4)
+        print("Reading PH sensor")
+        ph = arduinoSensor.get_data_from_arduino()[2]
+        print(f"PH: {ph}")
+        return float(ph)
+    
+ph = PH()
