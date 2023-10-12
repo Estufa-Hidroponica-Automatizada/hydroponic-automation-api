@@ -18,23 +18,14 @@ class GreenhouseService():
         waterLevelMeasure = waterLevel.read_value()
         phMeasure = ph.read_value()
         ecMeasure = ec.read_value()
-        print("Valores medidos:")
-        print(f"Air temperature: {temperatureMeasure}ºC")
-        print(f"Humidity: {humidityMeasure}%")
-        print(f"Light: {lightMeasure}")
-        print(f"Water Level: {waterLevelMeasure}")
-        print(f"pH: {phMeasure}")
-        print(f"EC: {ecMeasure}")
 
 
         print("----------------------ATUANDO-------------------------")
         isSupposedToBeOn = lightService.isSupposedToBeOn()
 
         if isSupposedToBeOn:
-            print("Ligando a luz")
             relays["light"].turn_on()
         else:
-            print("Desligando a luz")
             relays["light"].turn_off()
 
         if phMeasure > -1:
@@ -44,6 +35,8 @@ class GreenhouseService():
             elif phMeasure > limitService.get_limit("ph_max")[2]:
                 print(f"Ph acima do máximo - {phMeasure}")
                 relays["pumpPhMinus"].turn_on_for(2)
+        else:
+            print("Erro ao ler PH - Alerta!")
 
         if ecMeasure > -1:
             if ecMeasure < limitService.get_limit("ec_min")[2]:
@@ -55,6 +48,8 @@ class GreenhouseService():
             elif ecMeasure > limitService.get_limit("ec_max")[2]:
                 print(f"EC acima do máximo - {ecMeasure}ppm")
                 pass # TODO - Alerta de troca de agua??
+        else:
+            print("Erro ao ler EC - Alerta!")
 
         if temperatureMeasure > -1:
             if temperatureMeasure > limitService.get_limit("temperature_max")[2] or humidityMeasure > limitService.get_limit("humidity_max")[2]:
@@ -65,6 +60,8 @@ class GreenhouseService():
                 print(f"Desligando exaustor e ventilador - {temperatureMeasure}ºC | {humidityMeasure}%")
                 relays["exhaustor"].turn_off()
                 relays["fan"].turn_off()
+        else:
+            print("Erro ao ler temperatura - Alerta!")
 
         if light.read_value() == 0 and isSupposedToBeOn:
             print("Alerta - Luz está desligada indevidamente")

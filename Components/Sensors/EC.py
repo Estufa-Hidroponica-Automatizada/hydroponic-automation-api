@@ -1,8 +1,10 @@
-from Components.Sensors.Sensor import Sensor
+from Components.Sensors.ArduinoSensor import arduinoSensor
 
-class EC(Sensor):
+class EC():
     def read_value(self):
-        print("Lendo sensor EC")
-        return 400
+        print("Reading EC sensor")
+        ec = arduinoSensor.get_data_from_arduino()[3]
+        print(f"EC: {ec}")
+        return int(ec)
     
-ec = EC(2)
+ec = EC()

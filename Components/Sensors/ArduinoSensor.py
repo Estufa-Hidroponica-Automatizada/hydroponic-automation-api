@@ -13,7 +13,7 @@ class ArduinoSensor():
             data = self.ser.readline().decode().strip()  # Lê uma linha da porta serial
             if data:
                 data_return = data.split(',')
-                if len(data_return) == 3:
+                if len(data_return) == 4:
                     return data_return
         return data_return
     

@@ -5,6 +5,6 @@ class WaterTemp():
         print("Reading Water Temperature sensor")
         waterTemperature = arduinoSensor.get_data_from_arduino()[1]
         print(f"Water Temperature: {waterTemperature}")
-        return float(waterTemperature)
+        return round(float(waterTemperature), 2)
     
 waterTemp = WaterTemp()
