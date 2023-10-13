@@ -33,6 +33,43 @@ app.config['JWT_SECRET_KEY'] = 'seu_segredo_super_secreto'
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False 
 
+@app.route('/actuator', methods=['GET']) # Retorna todos os estados dos atuadores
+#@jwt_required()
+def get_actuators():
+    return jsonify({
+        "light": relays["light"].get_state(),
+        "fan": relays["fan"].get_state(),
+        "exhaustor": relays["exhaustor"].get_state(),
+        "pumpPhPlus": relays["pumpPhPlus"].get_state(),
+        "pumpPhMinus": relays["pumpPhMinus"].get_state(),
+        "pumpNutrientA": relays["pumpNutrientA"].get_state(),
+        "pumpNutrientB": relays["pumpNutrientB"].get_state()
+    }), 200
+
+@app.route('/actuator/<value>/<action>', methods=['POST']) # Retorna todos os estados dos atuadores
+#@jwt_required()
+def set_actuators(value, action):
+    if value not in relays.keys():
+        return jsonify({ "result": False, "message": "Atuador fornecido não é válido." }), 400
+    if action == "on":
+        relays[value].turn_on()
+    elif action == "off":
+        relays[value].turn_off()
+    else:
+        return jsonify({ "result": False, "message": "Ação fornecida é inválida. Ações disponíveis: on/off" }), 400
+    return jsonify({ "result": True }), 200
+
+@app.route('/actuator/<value>/on_for/<seconds>', methods=['POST']) # Retorna todos os estados dos atuadores
+#@jwt_required()
+def set_actuators_for(value, seconds):
+    if not seconds.isnumeric():
+        return jsonify({ "result": False, "message": "Segundos fornecidos não é um valor válido" }), 400
+    if value not in relays.keys():
+        return jsonify({ "result": False, "message": "Atuador fornecido não é válido." }), 400
+    relays[value].turn_on_for(int(seconds))
+    return jsonify({ "result": True }), 200
+
+
 @app.route('/sensor', methods=['GET']) # Retorna todos os valores medidos nos sensores
 #@jwt_required()
 def read_sensors():

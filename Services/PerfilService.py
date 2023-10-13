@@ -46,13 +46,10 @@ class PerfilService():
         databaseService.add_day_perfil_atual()
 
     def update_limits_for_days_by_perfil(self):
-        print(f"perfil atual: {self.perfil_atual}")
         perfil_atual = self.get_perfil(self.perfil_atual[0])
-        print(f"perfil: {perfil_atual}")
         week = perfilService.perfil_atual[1] // 7
-        print(f"semana: {week}")
         if week >= len(ast.literal_eval(perfil_atual[2])):
-            print("Plantio finalizado")
+            print("Plantio finalizado - Alerta!")
             return
         #setar limites
         limitService.set_limit('temperature_min', ast.literal_eval(perfil_atual[2])[week])
