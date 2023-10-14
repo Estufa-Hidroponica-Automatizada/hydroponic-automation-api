@@ -34,11 +34,15 @@ class GreenhouseService():
             ph_min, ph_max = limitService.get_limit("ph_min")[2], limitService.get_limit("ph_max")[2]
             print(f"Limites de pH - mín: {ph_min} | máx: {ph_max}")
             if phMeasure < ph_min:
-                print(f"Ph abaixo do mínimo - {phMeasure}")
-                relays["pumpPhPlus"].turn_on_for(2)
+                time_to_apply = ((ph_min - phMeasure) / 0.25) # 1 seg para cada 0.25 a menos
+                print(f"Ph abaixo do mínimo por {(ph_min - phMeasure)}")
+                print(f"Ativando bomba de pH+ por {time_to_apply} segundos")
+                relays["pumpPhPlus"].turn_on_for(time_to_apply)
             elif phMeasure > ph_max:
-                print(f"Ph acima do máximo - {phMeasure}")
-                relays["pumpPhMinus"].turn_on_for(2)
+                time_to_apply = ((phMeasure - ph_max) / 0.25) # 1 seg para cada 0.25 a mais
+                print(f"Ph acima do máximo por {(phMeasure - ph_max) }")
+                print(f"Ativando bomba de pH- por {time_to_apply} segundos")
+                relays["pumpPhMinus"].turn_on_for(time_to_apply)
         else:
             print("Erro ao ler PH - Alerta!")
 
@@ -46,13 +50,17 @@ class GreenhouseService():
             ec_min, ec_max = limitService.get_limit("ec_min")[2], limitService.get_limit("ec_max")[2]
             print(f"Limites de EC - mín: {ec_min}ppm | máx: {ec_max}ppm")
             if ecMeasure < ec_min:
-                print(f"EC abaixo do mínimo - {ecMeasure}ppm")
-                print(f"Ativando bomba A por {nutrientService.nutrients[0]} segundos")
-                relays["pumpNutrientA"].turn_on_for(nutrientService.nutrients[0])
-                print(f"Ativando bomba B por {nutrientService.nutrients[1]} segundos")
-                relays["pumpNutrientB"].turn_on_for(nutrientService.nutrients[1])
+                time_multiplier = ((ec_min - ecMeasure) / 65) # 1 seg para cada 65ppm a menos
+                time_nutrient_A = nutrientService.nutrients[0] * time_multiplier
+                time_nutrient_B = nutrientService.nutrients[1] * time_multiplier
+                print(f"EC abaixo do mínimo por {(ec_min - ecMeasure)}ppm")
+                print(f"Fator de multiplicação: {time_multiplier}")
+                print(f"Ativando bomba A por {time_nutrient_A} segundos")
+                relays["pumpNutrientA"].turn_on_for(time_nutrient_A)
+                print(f"Ativando bomba B por {time_nutrient_B} segundos")
+                relays["pumpNutrientB"].turn_on_for(time_nutrient_B)
             elif ecMeasure > ec_max:
-                print(f"EC acima do máximo - {ecMeasure}ppm")
+                print(f"EC acima do máximo por {(ecMeasure - ec_max)}ppm")
                 pass # TODO - Alerta de troca de agua??
         else:
             print("Erro ao ler EC - Alerta!")
