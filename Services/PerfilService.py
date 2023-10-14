@@ -48,6 +48,9 @@ class PerfilService():
     def update_limits_for_days_by_perfil(self):
         perfil_atual = self.get_perfil(self.perfil_atual[0])
         week = perfilService.perfil_atual[1] // 7
+        print("--------------- Atualizando limites ---------------")
+        print(f"Semana: {week}")
+        print(f"Perfil atual: {self.build_perfil_object(perfil_atual)}")
         if week >= len(ast.literal_eval(perfil_atual[2])):
             print("Plantio finalizado - Alerta!")
             return
@@ -65,13 +68,12 @@ class PerfilService():
         #setar lightschedule
         lightService.delete_all_schedule()
         schedule_list = ast.literal_eval(perfil_atual[12])
-        print(f"schedule list: {schedule_list}")
         for alarm in schedule_list[week]:
             lightService.insert_schedule(alarm[0], alarm[1], alarm[2])
         #setar nutrient proportion
         nutrient_proportion = ast.literal_eval(perfil_atual[13])[week]
-        print(f"nutrient_proportion: {nutrient_proportion}")
         nutrientService.set_proportion(nutrient_proportion[0],nutrient_proportion[1])
+        print("--------------- Fim atualização de limites ---------------")
 
     def build_perfil_object(self, perfil_list):
         return {

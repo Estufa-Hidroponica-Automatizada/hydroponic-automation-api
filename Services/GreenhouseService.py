@@ -24,35 +24,43 @@ class GreenhouseService():
         isSupposedToBeOn = lightService.isSupposedToBeOn()
 
         if isSupposedToBeOn:
+            print("Luzes ligadas!")
             relays["light"].turn_on()
         else:
+            print("Luzes desligadas!")
             relays["light"].turn_off()
 
         if phMeasure > -1:
-            if phMeasure < limitService.get_limit("ph_min")[2]:
+            ph_min, ph_max = limitService.get_limit("ph_min")[2], limitService.get_limit("ph_max")[2]
+            print(f"Limites de pH - mín: {ph_min} | máx: {ph_max}")
+            if phMeasure < ph_min:
                 print(f"Ph abaixo do mínimo - {phMeasure}")
                 relays["pumpPhPlus"].turn_on_for(2)
-            elif phMeasure > limitService.get_limit("ph_max")[2]:
+            elif phMeasure > ph_max:
                 print(f"Ph acima do máximo - {phMeasure}")
                 relays["pumpPhMinus"].turn_on_for(2)
         else:
             print("Erro ao ler PH - Alerta!")
 
         if ecMeasure > -1:
-            if ecMeasure < limitService.get_limit("ec_min")[2]:
+            ec_min, ec_max = limitService.get_limit("ec_min")[2], limitService.get_limit("ec_max")[2]
+            print(f"Limites de EC - mín: {ec_min}ppm | máx: {ec_max}ppm")
+            if ecMeasure < ec_min:
                 print(f"EC abaixo do mínimo - {ecMeasure}ppm")
                 print(f"Ativando bomba A por {nutrientService.nutrients[0]} segundos")
                 relays["pumpNutrientA"].turn_on_for(nutrientService.nutrients[0])
                 print(f"Ativando bomba B por {nutrientService.nutrients[1]} segundos")
                 relays["pumpNutrientB"].turn_on_for(nutrientService.nutrients[1])
-            elif ecMeasure > limitService.get_limit("ec_max")[2]:
+            elif ecMeasure > ec_max:
                 print(f"EC acima do máximo - {ecMeasure}ppm")
                 pass # TODO - Alerta de troca de agua??
         else:
             print("Erro ao ler EC - Alerta!")
 
         if temperatureMeasure > -1:
-            if temperatureMeasure > limitService.get_limit("temperature_max")[2] or humidityMeasure > limitService.get_limit("humidity_max")[2]:
+            humidity_max, temperature_max = limitService.get_limit("humidity_max")[2], limitService.get_limit("temperature_max")[2]
+            print(f"Limites máximo de temperatura e humidade - Temperatura: {temperature_max}ºC | Himidade: {humidity_max}%")
+            if temperatureMeasure > temperature_max or humidityMeasure > humidity_max:
                 print(f"Temperatura e/ou humidade fora da faixa - {temperatureMeasure}ºC | {humidityMeasure}%")
                 relays["exhaustor"].turn_on()
                 relays["fan"].turn_on()
@@ -63,7 +71,7 @@ class GreenhouseService():
         else:
             print("Erro ao ler temperatura - Alerta!")
 
-        if light.read_value() == 0 and isSupposedToBeOn:
+        if lightMeasure < 100 and isSupposedToBeOn:
             print("Alerta - Luz está desligada indevidamente")
             pass # TODO - Lançar alerta de luz falha
 

@@ -1,4 +1,5 @@
 import datetime
+import pytz
 from Services.DatabaseService import databaseService
 
 
@@ -27,7 +28,7 @@ class LightService():
         return True
     
     def isSupposedToBeOn(self):
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(pytz.timezone('America/Sao_Paulo'))
         current_hour, current_minute = now.hour, now.minute
 
         latest_time = None
@@ -42,6 +43,6 @@ class LightService():
                 latest_time = time_diff
                 latest_state = state
 
-        return True if latest_state == 1 else False
+        return latest_state == 1
 
 lightService = LightService()
