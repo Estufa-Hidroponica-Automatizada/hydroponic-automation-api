@@ -4,4 +4,4 @@ class Sensor(): # Abstract - DO NOT instantiate
 
     def read_value(self):
         print("Not defined!")
-        return 0
+        return -1

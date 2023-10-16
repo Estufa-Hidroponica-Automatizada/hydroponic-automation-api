@@ -12,7 +12,7 @@ class WaterLevel(Sensor):
         value = GPIO.input(self.pin)
         print(f"Water Level: {'Good' if value == GPIO.LOW else 'Bad'}")
         if value is not None:
-            return 0 if value == GPIO.HIGH else 1
+            return value != GPIO.HIGH
         else:
             return -1
     

@@ -8,6 +8,7 @@ from Components.Actuators.Relay import relays
 from Services.LightService import lightService
 from Services.LimitService import limitService
 from Services.NutrientService import nutrientService
+from Services.NtfyService import ntfyService
 
 class GreenhouseService():
     def maintaince(self):
@@ -16,36 +17,10 @@ class GreenhouseService():
         temperatureMeasure, humidityMeasure = dht22.read_value()
         lightMeasure = light.read_value()
         waterLevelMeasure = waterLevel.read_value()
-        phMeasure = ph.read_value()
-        ecMeasure = ec.read_value()
 
 
         print("----------------------ATUANDO-------------------------")
-        isSupposedToBeOn = lightService.isSupposedToBeOn()
-
-        if isSupposedToBeOn:
-            print("Luzes ligadas!")
-            relays["light"].turn_on()
-        else:
-            print("Luzes desligadas!")
-            relays["light"].turn_off()
-
-        if phMeasure > -1:
-            ph_min, ph_max = limitService.get_limit("ph_min")[2], limitService.get_limit("ph_max")[2]
-            print(f"Limites de pH - mín: {ph_min} | máx: {ph_max}")
-            if phMeasure < ph_min:
-                time_to_apply = ((ph_min - phMeasure) / 0.25) # 1 seg para cada 0.25 a menos
-                print(f"Ph abaixo do mínimo por {(ph_min - phMeasure)}")
-                print(f"Ativando bomba de pH+ por {time_to_apply} segundos")
-                relays["pumpPhPlus"].turn_on_for(time_to_apply)
-            elif phMeasure > ph_max:
-                time_to_apply = ((phMeasure - ph_max) / 0.25) # 1 seg para cada 0.25 a mais
-                print(f"Ph acima do máximo por {(phMeasure - ph_max) }")
-                print(f"Ativando bomba de pH- por {time_to_apply} segundos")
-                relays["pumpPhMinus"].turn_on_for(time_to_apply)
-        else:
-            print("Erro ao ler PH - Alerta!")
-
+        ecMeasure = ec.read_value()
         if ecMeasure > -1:
             ec_min, ec_max = limitService.get_limit("ec_min")[2], limitService.get_limit("ec_max")[2]
             print(f"Limites de EC - mín: {ec_min}ppm | máx: {ec_max}ppm")
@@ -61,9 +36,26 @@ class GreenhouseService():
                 relays["pumpNutrientB"].turn_on_for(time_nutrient_B)
             elif ecMeasure > ec_max:
                 print(f"EC acima do máximo por {(ecMeasure - ec_max)}ppm")
-                pass # TODO - Alerta de troca de agua??
+                ntfyService.send_notification(f"A condutividade da água está acima do limite, considere trocar a água! - Limite: {ec_max}ppm | Medido: {ecMeasure}ppm", "Alerta - Limites excedidos!", "high", "warning")
         else:
-            print("Erro ao ler EC - Alerta!")
+            ntfyService.send_notification("Ocorreu um erro ao ler a EC da água!", "Alerta - Sensor com defeito!", "max", "rotating_light")
+
+        phMeasure = ph.read_value()
+        if phMeasure > -1:
+            ph_min, ph_max = limitService.get_limit("ph_min")[2], limitService.get_limit("ph_max")[2]
+            print(f"Limites de pH - mín: {ph_min} | máx: {ph_max}")
+            if phMeasure < ph_min:
+                time_to_apply = ((ph_min - phMeasure) / 0.25) # 1 seg para cada 0.25 a menos
+                print(f"Ph abaixo do mínimo por {(ph_min - phMeasure)}")
+                print(f"Ativando bomba de pH+ por {time_to_apply} segundos")
+                relays["pumpPhPlus"].turn_on_for(time_to_apply)
+            elif phMeasure > ph_max:
+                time_to_apply = ((phMeasure - ph_max) / 0.25) # 1 seg para cada 0.25 a mais
+                print(f"Ph acima do máximo por {(phMeasure - ph_max) }")
+                print(f"Ativando bomba de pH- por {time_to_apply} segundos")
+                relays["pumpPhMinus"].turn_on_for(time_to_apply)
+        else:
+            ntfyService.send_notification("Ocorreu um erro ao ler o pH da água!", "Alerta - Sensor com defeito!", "max", "rotating_light")
 
         if temperatureMeasure > -1:
             humidity_max, temperature_max = limitService.get_limit("humidity_max")[2], limitService.get_limit("temperature_max")[2]
@@ -77,15 +69,24 @@ class GreenhouseService():
                 relays["exhaustor"].turn_off()
                 relays["fan"].turn_off()
         else:
-            print("Erro ao ler temperatura - Alerta!")
+            ntfyService.send_notification("Ocorreu um erro ao ler a temperatura/humidade do ambiente!", "Alerta - Sensor com defeito!", "max", "rotating_light")
+
+        isSupposedToBeOn = lightService.isSupposedToBeOn()
+
+        if isSupposedToBeOn:
+            print("Luzes ligadas!")
+            relays["light"].turn_on()
+        else:
+            print("Luzes desligadas!")
+            relays["light"].turn_off()
 
         if lightMeasure < 100 and isSupposedToBeOn:
             print("Alerta - Luz está desligada indevidamente")
-            pass # TODO - Lançar alerta de luz falha
+            ntfyService.send_notification("A luz está apagada e deveria estar acesa!", "Alerta - Luz com defeito!", "max", "rotating_light")
 
-        if waterLevelMeasure == 0:
+        if not waterLevelMeasure:
             print("Alerta - Nível de água baixo")
-            pass # TODO - Lançar alerta de baixo nível de agua
+            ntfyService.send_notification("O nível da água esta baixo!", "Alerta - Nível de água", "high", "warning")
 
         print("----------------FIM MANUTENCAO------------------")
             

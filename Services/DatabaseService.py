@@ -70,49 +70,49 @@ class DatabaseService():
         self.cursor.execute('DELETE FROM light_schedule')
         self.conn.commit()
     
-    def get_perfils(self):
-        self.cursor.execute('SELECT * FROM perfil')
-        perfils = self.cursor.fetchall()
-        return perfils
+    def get_profiles(self):
+        self.cursor.execute('SELECT * FROM profile')
+        profiles = self.cursor.fetchall()
+        return profiles
 
-    def get_perfil(self, id):
-        self.cursor.execute('SELECT * FROM perfil WHERE id = ?', (id,))
-        perfil = self.cursor.fetchone()
-        return perfil
+    def get_profile(self, id):
+        self.cursor.execute('SELECT * FROM profile WHERE id = ?', (id,))
+        profile = self.cursor.fetchone()
+        return profile
     
     def get_user_info(self):
         self.cursor.execute('SELECT * FROM user')
-        perfil = self.cursor.fetchone()
-        return {'username': perfil[0], "password": perfil[1]}
+        profile = self.cursor.fetchone()
+        return {'username': profile[0], "password": profile[1]}
     
     def set_new_password(self, new_password):
         hashed_password = self.bcrypt.generate_password_hash(new_password).decode('utf-8')
         self.cursor.execute('UPDATE user SET password = ?', (hashed_password,))
         self.conn.commit()
 
-    def post_perfil(self, name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion):
-        self.cursor.execute('INSERT INTO perfil (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion))
+    def post_profile(self, name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion):
+        self.cursor.execute('INSERT INTO profile (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion))
         self.conn.commit()
 
-    def put_perfil(self, id, name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion):
-        self.cursor.execute('UPDATE perfil SET name = ?, temperature_min = ?, temperature_max = ?, humidity_min = ?, humidity_max = ?, ph_min = ?, ph_max = ?, ec_min = ?, ec_max = ?, water_temperature_min = ?, water_temperature_max = ?, light_schedule = ?, nutrient_proportion =? WHERE id = ?', (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion, id))
+    def put_profile(self, id, name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion):
+        self.cursor.execute('UPDATE profile SET name = ?, temperature_min = ?, temperature_max = ?, humidity_min = ?, humidity_max = ?, ph_min = ?, ph_max = ?, ec_min = ?, ec_max = ?, water_temperature_min = ?, water_temperature_max = ?, light_schedule = ?, nutrient_proportion =? WHERE id = ?', (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion, id))
         self.conn.commit()
 
-    def delete_perfil(self, id):
-        self.cursor.execute('DELETE FROM perfil WHERE id = ?', (id,))
+    def delete_profile(self, id):
+        self.cursor.execute('DELETE FROM profile WHERE id = ?', (id,))
         self.conn.commit()
 
-    def get_perfil_atual(self):
-        self.cursor.execute('SELECT * FROM perfil_atual')
-        perfil = self.cursor.fetchone()
-        return perfil
+    def get_profile_actual(self):
+        self.cursor.execute('SELECT * FROM profile_actual')
+        profile = self.cursor.fetchone()
+        return profile
 
-    def post_perfil_atual(self, id, dias=0):
-        self.cursor.execute('UPDATE perfil_atual SET id_selected = ?, days_passed = ?', (id, dias))
+    def post_profile_actual(self, id, dias=0):
+        self.cursor.execute('UPDATE profile_actual SET id_selected = ?, days_passed = ?', (id, dias))
         self.conn.commit()
 
-    def add_day_perfil_atual(self):
-        self.cursor.execute('UPDATE perfil_atual SET days_passed = ((SELECT days_passed FROM perfil_atual) + 1)')
+    def add_day_profile_actual(self):
+        self.cursor.execute('UPDATE profile_actual SET days_passed = ((SELECT days_passed FROM profile_actual) + 1)')
         self.conn.commit()
 
     def close(self):

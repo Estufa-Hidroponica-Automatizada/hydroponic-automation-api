@@ -9,7 +9,7 @@ CREATE TABLE nutrient_proportion (
   nutrientB INTEGER
 );
 
-CREATE TABLE perfil (
+CREATE TABLE profile (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT,
   temperature_min TEXT, -- Eg.: 22,25,27 - Para cada semana um valor
@@ -26,7 +26,7 @@ CREATE TABLE perfil (
   nutrient_proportion TEXT -- Eg.: (2,3),(1,1),(2,1)
 );
 
-CREATE TABLE perfil_atual (
+CREATE TABLE profile_actual (
   id_selected INTEGER,
   days_passed INTEGER
 );
@@ -62,9 +62,9 @@ VALUES (8, 15, 1),
 INSERT INTO nutrient_proportion (nutrientA, nutrientB)
 VALUES (3, 2);
 
-INSERT INTO perfil (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion)
-VALUES ("PerfilA", "22,25,27", "27,29,31", "40,50,55", "75,80,85", "6,6.5,6.6", "7,7.1,7.2", "500,450,600", "650,600,800", "20,23,25", "25,28,30", "[[(8,20,1),(20,0,0)],[(7,0,1),(21,0,0)],[(7,40,1),(20,45,0)]]", "[(2,3),(1,1),(2,1)]"),
-       ("PerfilB", "21,22,25", "25,27,30", "30,55,55", "50,70,80", "6,6.3,6.3", "7.1,7,7.3", "550,450,650", "680,590,830", "20,23,25", "25,28,30", "[[(8,15,1),(19,0,0)],[(7,30,1),(21,15,0)],[(8,40,1),(18,45,0)]]", "[(2,3),(1,1),(2,1)]");
+INSERT INTO profile (name, temperature_min, temperature_max, humidity_min, humidity_max, ph_min, ph_max, ec_min, ec_max, water_temperature_min, water_temperature_max, light_schedule, nutrient_proportion)
+VALUES ("ProfileA", "22,25,27", "27,29,31", "40,50,55", "75,80,85", "6,6.5,6.6", "7,7.1,7.2", "500,450,600", "650,600,800", "20,23,25", "25,28,30", "[[(8,20,1),(20,0,0)],[(7,0,1),(21,0,0)],[(7,40,1),(20,45,0)]]", "[(2,3),(1,1),(2,1)]"),
+       ("ProfileB", "21,22,25", "25,27,30", "30,55,55", "50,70,80", "6,6.3,6.3", "7.1,7,7.3", "550,450,650", "680,590,830", "20,23,25", "25,28,30", "[[(8,15,1),(19,0,0)],[(7,30,1),(21,15,0)],[(8,40,1),(18,45,0)]]", "[(2,3),(1,1),(2,1)]");
 
-INSERT INTO perfil_atual (id_selected, days_passed)
+INSERT INTO profile_actual (id_selected, days_passed)
 VALUES (1, 0)

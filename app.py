@@ -15,7 +15,7 @@ from Services.NutrientService import nutrientService
 from Services.LimitService import limitService
 from Services.GreenhouseService import greenhouseService
 from Services.WebcamService import webcamService
-from Services.PerfilService import perfilService
+from Services.ProfileService import profileService
 from Services.DatabaseService import databaseService
 
 from flask_apscheduler import APScheduler
@@ -161,7 +161,7 @@ def light_schedule_id(id):
         lightService.delete_schedule(id)
         return jsonify({"result": True}), 200
     
-@app.route('/nutrient/proportion', methods=['GET', 'PUT']) # Pega e atualiza porporção de nutrientes
+@app.route('/nutrient/proportion', methods=['GET', 'PUT']) # Pega e actualiza porporção de nutrientes
 #@jwt_required()
 def func_nutrients():
     if request.method == 'GET':
@@ -229,43 +229,43 @@ def logout():
     unset_jwt_cookies(resp)
     return resp, 200
 
-@app.route('/perfil', methods=['GET', 'POST'])
+@app.route('/profile', methods=['GET', 'POST'])
 #@jwt_required()
-def get_perfis():
+def get_profiles():
     if request.method == 'GET':
-        perfis = []
-        for perfil in perfilService.perfils:
-            perfis.append(perfilService.build_perfil_object(perfil))
-        return jsonify(perfis), 200
+        profiles = []
+        for profile in profileService.profiles:
+            profiles.append(profileService.build_profile_object(profile))
+        return jsonify(profiles), 200
     elif request.method == 'POST':
         data = request.get_json()
-        perfilService.insert_perfil(data['name'], data['temperature_min'], data['temperature_max'], data['humidity_min'], data['humidity_max'], data['ph_min'], data['ph_max'], data['ec_min'], data['ec_max'], data['water_temperature_min'], data['water_temperature_max'], data['light_schedule'], data['nutrient_proportion'])
+        profileService.insert_profile(data['name'], data['temperature_min'], data['temperature_max'], data['humidity_min'], data['humidity_max'], data['ph_min'], data['ph_max'], data['ec_min'], data['ec_max'], data['water_temperature_min'], data['water_temperature_max'], data['light_schedule'], data['nutrient_proportion'])
         return jsonify({"result": True}), 200
 
-@app.route('/perfil/<id>', methods=['GET', 'DELETE', 'PUT'])
+@app.route('/profile/<id>', methods=['GET', 'DELETE', 'PUT'])
 #@jwt_required()
-def action_perfil(id):
+def action_profile(id):
     if request.method == 'PUT':
         data = request.get_json()
-        perfilService.update_perfil(id, data['name'], data['temperature_min'], data['temperature_max'], data['humidity_min'], data['humidity_max'], data['ph_min'], data['ph_max'], data['ec_min'], data['ec_max'], data['water_temperature_min'], data['water_temperature_max'], data['light_schedule'], data['nutrient_proportion'])
-        perfilService.update_limits_for_days_by_perfil()
+        profileService.update_profile(id, data['name'], data['temperature_min'], data['temperature_max'], data['humidity_min'], data['humidity_max'], data['ph_min'], data['ph_max'], data['ec_min'], data['ec_max'], data['water_temperature_min'], data['water_temperature_max'], data['light_schedule'], data['nutrient_proportion'])
+        profileService.update_limits_for_days_by_profile()
         return jsonify({"result": True}), 200
     elif request.method == 'DELETE':
-        perfilService.delete_perfil(id)
+        profileService.delete_profile(id)
         return jsonify({"result": True}), 200
     elif request.method == 'GET':
-        return jsonify(perfilService.build_perfil_object(perfilService.get_perfil(id))), 200
+        return jsonify(profileService.build_profile_object(profileService.get_profile(id))), 200
 
-@app.route('/perfil/atual', methods=['GET', 'POST'])
+@app.route('/profile/actual', methods=['GET', 'POST'])
 #@jwt_required()
-def ongoing_perfil():
+def ongoing_profile():
     if request.method == 'POST':
         data = request.get_json()
-        perfilService.set_perfil_atual(data['id'], data['days'])
-        perfilService.update_limits_for_days_by_perfil()
+        profileService.set_profile_actual(data['id'], data['days'])
+        profileService.update_limits_for_days_by_profile()
         return jsonify({"result": True}), 200
     elif request.method == 'GET':
-        return jsonify(perfilService.build_perfil_atual_object(perfilService.perfil_atual)), 200
+        return jsonify(profileService.build_profile_actual_object(profileService.profile_actual)), 200
 
 @scheduler.task('interval', id='monitoring', seconds=600)
 def maintain_greenhouse():
@@ -274,8 +274,8 @@ def maintain_greenhouse():
 @scheduler.task('interval', id='updating', seconds=3600) # 86400 1 vez ao dia
 def daily_update():
     webcamService.get_save_photo()
-    perfilService.add_day()
-    perfilService.update_limits_for_days_by_perfil()
+    profileService.add_day()
+    profileService.update_limits_for_days_by_profile()
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port='3000')
