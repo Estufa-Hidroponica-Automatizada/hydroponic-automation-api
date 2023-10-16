@@ -7,12 +7,13 @@ class NtfyService():
         self.topic = topic
 
     def send_notification(self, message, title, priority, tags):
-            response = requests.post(f"{self.url}/{self.topic}",
+            requests.post(f"{self.url}/{self.topic}",
                                      data=message.encode(encoding='utf-8'),
                                      headers={
-                                        "Title": title,
+                                        "Title": title.encode(encoding='utf-8'),
                                         "Priority": priority,
                                         "Tags": tags
                                      })
         
 ntfyService = NtfyService("http://192.168.15.10:8000", "estufa")
+ntfyService.send_notification("Efetuando manutenção da estufa!", "Manutenção sendo efetuada", "default", "memo")

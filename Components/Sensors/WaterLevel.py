@@ -14,7 +14,8 @@ class WaterLevel(Sensor):
         if value is not None:
             return value != GPIO.HIGH
         else:
-            return -1
+            print("Erro ao ler nível da água!")
+            return False
     
 waterLevel = WaterLevel(24)
 

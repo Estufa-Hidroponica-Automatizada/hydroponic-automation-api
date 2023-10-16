@@ -14,6 +14,7 @@ class GreenhouseService():
     def maintaince(self):
         print("----------------INICIANDO MANUTENCAO------------------")
         print("-----------------------LENDO--------------------------")
+        ntfyService.send_notification("Efetuando manutenção da estufa!", "Manutenção sendo efetuada", "default", "memo")
         temperatureMeasure, humidityMeasure = dht22.read_value()
         lightMeasure = light.read_value()
         waterLevelMeasure = waterLevel.read_value()
