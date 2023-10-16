@@ -262,6 +262,8 @@ def ongoing_profile():
     if request.method == 'POST':
         data = request.get_json()
         profileService.set_profile_actual(data['id'], data['days'])
+        if data.get('erase', False):
+            webcamService.delete_photos()
         profileService.update_limits_for_days_by_profile()
         return jsonify({"result": True}), 200
     elif request.method == 'GET':

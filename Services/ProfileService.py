@@ -55,6 +55,7 @@ class ProfileService():
         if week >= len(ast.literal_eval(profile_actual[2])):
             print("Plantio finalizado")
             ntfyService.send_notification("Plantio foi finalizado!", "Boas notícias!", "default", "partying_face,tada")
+            return
         #setar limites
         limitService.set_limit('temperature_min', ast.literal_eval(profile_actual[2])[week])
         limitService.set_limit('temperature_max', ast.literal_eval(profile_actual[3])[week])
@@ -74,7 +75,7 @@ class ProfileService():
         #setar nutrient proportion
         nutrient_proportion = ast.literal_eval(profile_actual[13])[week]
         nutrientService.set_proportion(nutrient_proportion[0],nutrient_proportion[1])
-        print("--------------- Fim actualização de limites ---------------")
+        print("--------------- Fim atualização de limites ---------------")
 
     def build_profile_object(self, profile_list):
         return {

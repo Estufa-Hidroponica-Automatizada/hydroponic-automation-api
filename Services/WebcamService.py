@@ -72,4 +72,13 @@ class WebcamService:
 
         return photo_bytes
 
+    def delete_photos(self):
+        try:
+            for filename in os.listdir("./photos"):
+                file_path = os.path.join("./photos", filename)
+                os.remove(file_path)
+                print(f"Deleted: {file_path}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
 webcamService = WebcamService()
