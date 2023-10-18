@@ -14,11 +14,9 @@ class GreenhouseService():
     def maintaince(self):
         print("----------------INICIANDO MANUTENCAO------------------")
         print("-----------------------LENDO--------------------------")
-        ntfyService.send_notification("Efetuando manutenção da estufa!", "Manutenção sendo efetuada", "default", "memo")
         temperatureMeasure, humidityMeasure = dht22.read_value()
         lightMeasure = light.read_value()
         waterLevelMeasure = waterLevel.read_value()
-
 
         print("----------------------ATUANDO-------------------------")
         ecMeasure = ec.read_value()
@@ -89,7 +87,14 @@ class GreenhouseService():
             print("Alerta - Nível de água baixo")
             ntfyService.send_notification("O nível da água esta baixo!", "Alerta - Nível de água", "high", "warning")
 
+        ntfyService.send_notification(
+f"""Foi efetuada a manutenção e os seguintes valores foram lidos: 
+Temperatura: {temperatureMeasure}ºC
+Humidade: {humidityMeasure}%
+Luz: {lightMeasure} lumens
+Nível da água: {"Bom" if waterLevelMeasure else "Baixo"}
+EC: {ecMeasure}ppm
+pH: {phMeasure}""", "Relatório Periódico", "default", "memo")
         print("----------------FIM MANUTENCAO------------------")
             
 greenhouseService = GreenhouseService()
-

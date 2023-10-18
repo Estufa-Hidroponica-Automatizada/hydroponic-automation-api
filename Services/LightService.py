@@ -31,17 +31,17 @@ class LightService():
         now = datetime.datetime.now(pytz.timezone('America/Sao_Paulo'))
         current_hour, current_minute = now.hour, now.minute
 
-        latest_time = None
         latest_state = None
+        latest_time_diff = None
 
         for row in self.schedule:
             id, hour, minute, state = row
 
             time_diff = (current_hour - hour) * 60 + (current_minute - minute)
 
-            if time_diff >= 0 and (latest_time is None or time_diff < latest_time):
-                latest_time = time_diff
+            if latest_time_diff is None or (time_diff < latest_time_diff and (latest_time_diff >= 0 and time_diff >= 0) or (latest_time_diff < 0 and time_diff < 0)):
                 latest_state = state
+                latest_time_diff = time_diff
 
         return latest_state == 1
 
