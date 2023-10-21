@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import io
 from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
@@ -32,6 +33,40 @@ scheduler.start()
 app.config['JWT_SECRET_KEY'] = 'seu_segredo_super_secreto'
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False 
+MONITORING_INTERVAL = 600
+UPDATING_INTERVAL = 3600
+
+@scheduler.task('interval', id='monitoring', seconds=MONITORING_INTERVAL)
+def maintain_greenhouse():
+    databaseService.set_job_runtime('monitoring', str(datetime.now()))
+    greenhouseService.maintaince()
+
+@scheduler.task('interval', id='updating', seconds=UPDATING_INTERVAL) # 86400 1 vez ao dia
+def daily_update():
+    databaseService.set_job_runtime('updating', str(datetime.now()))
+    webcamService.get_save_photo()
+    profileService.add_day()
+    profileService.update_limits_for_days_by_profile()
+
+# Recupere os horários da última execução para cada job do banco de dados
+monitoring_time_str = databaseService.get_job_runtime('monitoring')[0]
+updating_time_str = databaseService.get_job_runtime('updating')[0]
+print(f'Ultimas execuções monitoring: {monitoring_time_str} | updating: {updating_time_str}')
+if monitoring_time_str != '' and updating_time_str != '':
+    last_execution_time_monitoring = datetime.strptime(monitoring_time_str, '%Y-%m-%d %H:%M:%S.%f')
+    last_execution_time_updating = datetime.strptime(updating_time_str, '%Y-%m-%d %H:%M:%S.%f')
+
+    # Calcule os próximos horários de execução com base no intervalo
+    interval_monitoring = timedelta(seconds=MONITORING_INTERVAL)
+    next_execution_time_monitoring = last_execution_time_monitoring + interval_monitoring
+
+    interval_updating = timedelta(seconds=UPDATING_INTERVAL)
+    next_execution_time_updating = last_execution_time_updating + interval_updating
+
+    # Configure os jobs com os próximos horários de execução
+    scheduler.modify_job('monitoring', next_run_time=next_execution_time_monitoring)
+    scheduler.modify_job('updating', next_run_time=next_execution_time_updating)
+    print(f'Proximas execuções definidas para monitoring: {next_execution_time_monitoring} | updating: {next_execution_time_updating}')
 
 @app.route('/actuator', methods=['GET']) # Retorna todos os estados dos atuadores
 #@jwt_required()
@@ -161,7 +196,7 @@ def light_schedule_id(id):
         lightService.delete_schedule(id)
         return jsonify({"result": True}), 200
     
-@app.route('/nutrient/proportion', methods=['GET', 'PUT']) # Pega e actualiza porporção de nutrientes
+@app.route('/nutrient/proportion', methods=['GET', 'PUT']) # Pega e atualiza porporção de nutrientes
 #@jwt_required()
 def func_nutrients():
     if request.method == 'GET':
@@ -256,28 +291,18 @@ def action_profile(id):
     elif request.method == 'GET':
         return jsonify(profileService.build_profile_object(profileService.get_profile(id))), 200
 
-@app.route('/profile/actual', methods=['GET', 'POST'])
+@app.route('/profile/current', methods=['GET', 'POST'])
 #@jwt_required()
 def ongoing_profile():
     if request.method == 'POST':
         data = request.get_json()
-        profileService.set_profile_actual(data['id'], data['days'])
+        profileService.set_current_profile(data['id'], data['days'])
         if data.get('erase', False):
             webcamService.delete_photos()
         profileService.update_limits_for_days_by_profile()
         return jsonify({"result": True}), 200
     elif request.method == 'GET':
-        return jsonify(profileService.build_profile_actual_object(profileService.profile_actual)), 200
-
-@scheduler.task('interval', id='monitoring', seconds=600)
-def maintain_greenhouse():
-    greenhouseService.maintaince()
-
-@scheduler.task('interval', id='updating', seconds=3600) # 86400 1 vez ao dia
-def daily_update():
-    webcamService.get_save_photo()
-    profileService.add_day()
-    profileService.update_limits_for_days_by_profile()
+        return jsonify(profileService.build_current_profile_object(profileService.current_profile)), 200
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port='3000')

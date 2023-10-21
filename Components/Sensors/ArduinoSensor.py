@@ -5,6 +5,8 @@ class ArduinoSensor():
         self.ser = Serial(sensor_folder, 9600)
 
     def get_data_from_arduino(self):
+        self.ser.write('R'.encode())
+
         data = None
         tries = 0
         data_return = -1, -1, -1

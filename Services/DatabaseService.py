@@ -102,19 +102,32 @@ class DatabaseService():
         self.cursor.execute('DELETE FROM profile WHERE id = ?', (id,))
         self.conn.commit()
 
-    def get_profile_actual(self):
-        self.cursor.execute('SELECT * FROM profile_actual')
+    def get_current_profile(self):
+        self.cursor.execute('SELECT * FROM current_profile')
         profile = self.cursor.fetchone()
         return profile
 
-    def post_profile_actual(self, id, dias=0):
-        self.cursor.execute('UPDATE profile_actual SET id_selected = ?, days_passed = ?', (id, dias))
+    def post_current_profile(self, id, dias=0, isFinished=False):
+        self.cursor.execute('UPDATE current_profile SET id_selected = ?, days_passed = ?, is_finished = ?', (id, dias, isFinished))
         self.conn.commit()
 
-    def add_day_profile_actual(self):
-        self.cursor.execute('UPDATE profile_actual SET days_passed = ((SELECT days_passed FROM profile_actual) + 1)')
+    def add_day_current_profile(self):
+        self.cursor.execute('UPDATE current_profile SET days_passed = ((SELECT days_passed FROM current_profile) + 1)')
         self.conn.commit()
 
+    def set_current_profile_finished(self):
+        self.cursor.execute('UPDATE current_profile SET is_finished = true')
+        self.conn.commit()
+
+    def get_job_runtime(self, job_id):
+        self.cursor.execute('SELECT runtime FROM job_runtime WHERE id = ?', (job_id,))
+        runtime = self.cursor.fetchone()
+        return runtime
+    
+    def set_job_runtime(self, job_id, runtime):
+        self.cursor.execute('UPDATE job_runtime SET runtime = ? WHERE id = ?', (runtime, job_id))
+        self.conn.commit()
+    
     def close(self):
         self.conn.close()
 

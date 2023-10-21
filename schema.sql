@@ -26,9 +26,10 @@ CREATE TABLE profile (
   nutrient_proportion TEXT -- Eg.: (2,3),(1,1),(2,1)
 );
 
-CREATE TABLE profile_actual (
+CREATE TABLE current_profile (
   id_selected INTEGER,
-  days_passed INTEGER
+  days_passed INTEGER,
+  is_finished BOOLEAN
 );
 
 CREATE TABLE light_schedule (
@@ -41,6 +42,11 @@ CREATE TABLE light_schedule (
 CREATE TABLE user (
   username TEXT,
   password TEXT
+);
+
+CREATE TABLE job_runtime (
+  id TEXT,
+  runtime TEXT
 );
 
 INSERT INTO limit_value (name, value)
@@ -66,5 +72,8 @@ INSERT INTO profile (name, temperature_min, temperature_max, humidity_min, humid
 VALUES ("ProfileA", "22,25,27", "27,29,31", "40,50,55", "75,80,85", "6,6.5,6.6", "7,7.1,7.2", "500,450,600", "650,600,800", "20,23,25", "25,28,30", "[[(8,20,1),(20,0,0)],[(7,0,1),(21,0,0)],[(7,40,1),(20,45,0)]]", "[(2,3),(1,1),(2,1)]"),
        ("ProfileB", "21,22,25", "25,27,30", "30,55,55", "50,70,80", "6,6.3,6.3", "7.1,7,7.3", "550,450,650", "680,590,830", "20,23,25", "25,28,30", "[[(8,15,1),(19,0,0)],[(7,30,1),(21,15,0)],[(8,40,1),(18,45,0)]]", "[(2,3),(1,1),(2,1)]");
 
-INSERT INTO profile_actual (id_selected, days_passed)
-VALUES (1, 0)
+INSERT INTO current_profile (id_selected, days_passed, is_finished)
+VALUES (1, 0, False);
+
+INSERT INTO job_runtime (id, runtime)
+VALUES ('monitoring', ''), ('updating', '');
