@@ -49,6 +49,7 @@ def daily_update():
     profileService.update_limits_for_days_by_profile()
 
 # Recupere os horários da última execução para cada job do banco de dados
+greenhouseService.turning_light_fan_on()
 monitoring_time_str = databaseService.get_job_runtime('monitoring')[0]
 updating_time_str = databaseService.get_job_runtime('updating')[0]
 print(f'Ultimas execuções monitoring: {monitoring_time_str} | updating: {updating_time_str}')
@@ -71,15 +72,7 @@ if monitoring_time_str != '' and updating_time_str != '':
 @app.route('/actuator', methods=['GET']) # Retorna todos os estados dos atuadores
 #@jwt_required()
 def get_actuators():
-    return jsonify({
-        "light": relays["light"].get_state(),
-        "fan": relays["fan"].get_state(),
-        "exhaustor": relays["exhaustor"].get_state(),
-        "pumpPhPlus": relays["pumpPhPlus"].get_state(),
-        "pumpPhMinus": relays["pumpPhMinus"].get_state(),
-        "pumpNutrientA": relays["pumpNutrientA"].get_state(),
-        "pumpNutrientB": relays["pumpNutrientB"].get_state()
-    }), 200
+    return jsonify({key: relays[key].get_state() for key in relays.keys()}), 200
 
 @app.route('/actuator/<value>/<action>', methods=['POST']) # Retorna todos os estados dos atuadores
 #@jwt_required()
@@ -179,7 +172,7 @@ def get_limit(value):
 #@jwt_required()
 def light_schedule():
     if request.method == 'GET':
-        return jsonify(lightService.schedule)
+        return jsonify(lightService._from_list_to_light_schedule(lightService.schedule))
     elif request.method == 'POST':
         data = request.get_json()
         lightService.insert_schedule(data['hour'], data['minute'], data['state'])
@@ -200,7 +193,7 @@ def light_schedule_id(id):
 #@jwt_required()
 def func_nutrients():
     if request.method == 'GET':
-        return jsonify(nutrientService.nutrients)
+        return jsonify({"nutrientA":nutrientService.nutrients[0], "nutrientB":nutrientService.nutrients[1]})
     elif request.method == 'PUT':
         data = request.get_json()
         nutrientService.set_proportion(data['nutrientA'], data['nutrientB'])

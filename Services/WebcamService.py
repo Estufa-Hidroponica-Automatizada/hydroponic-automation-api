@@ -56,7 +56,7 @@ class WebcamService:
     def get_save_photo(self):
         print("Fotografando ambiente")
         lightInitialState = relays["light"].get_state()
-        if lightInitialState == "OFF":
+        if not lightInitialState:
             relays["light"].turn_on()
             time.sleep(0.5)
         
@@ -66,7 +66,7 @@ class WebcamService:
             with open(f"./photos/{photoName}.jpg", "wb") as f:
                 f.write(photo_bytes)
         
-        if lightInitialState == "OFF": 
+        if not lightInitialState: 
             relays["light"].turn_off()
 
         return photo_bytes

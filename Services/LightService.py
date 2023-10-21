@@ -44,5 +44,11 @@ class LightService():
                 latest_time_diff = time_diff
 
         return latest_state == 1
+    
+    def _from_list_to_light_schedule(self, input_data):
+        light_schedule = []
+        for entry in input_data:
+            light_schedule.append({"hour": entry[1], "minute": entry[2], "state": entry[3]})
+        return light_schedule
 
 lightService = LightService()

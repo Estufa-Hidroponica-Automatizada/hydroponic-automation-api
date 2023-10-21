@@ -52,14 +52,17 @@ class ProfileService():
 
     def update_limits_for_days_by_profile(self):
         current_profile = self.get_profile(self.current_profile[0])
-        week = profileService.current_profile[1] // 7
+        week = self.current_profile[1] // 7
         print("--------------- Atualizando limites ---------------")
+        print(f"Dados perfil atual: {self.build_current_profile_object(self.current_profile)}")
         print(f"Semana: {week}")
         print(f"Perfil atual: {self.build_profile_object(current_profile)}")
-        if week >= len(ast.literal_eval(current_profile[2])) and not profileService.current_profile[2]:
-            print("Plantio finalizado")
+        if week >= len(ast.literal_eval(current_profile[2])):
+            print("Plantio finalizado!")
+            if not self.current_profile[2]:
+                print("Notificação sendo enviada!")
+                ntfyService.send_notification("Plantio foi finalizado!", "Boas notícias!", "default", "partying_face,tada")
             databaseService.set_current_profile_finished()
-            ntfyService.send_notification("Plantio foi finalizado!", "Boas notícias!", "default", "partying_face,tada")
             return
         #setar limites
         limitService.set_limit('temperature_min', ast.literal_eval(current_profile[2])[week])
@@ -104,7 +107,7 @@ class ProfileService():
         return {
             "id": current_profile_list[0],
             "days": current_profile_list[1],
-            "isFinished": current_profile_list[2]
+            "isFinished": current_profile_list[2] == 1
         }
     
     def _from_list_to_light_schedule(self, input_data):

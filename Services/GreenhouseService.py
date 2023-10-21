@@ -1,3 +1,4 @@
+import time
 from Components.Sensors.DHT22 import dht22
 from Components.Sensors.EC import ec
 from Components.Sensors.Light import light
@@ -16,7 +17,6 @@ class GreenhouseService():
         print("----------------INICIANDO MANUTENCAO------------------")
         print("-----------------------LENDO--------------------------")
         temperatureMeasure, humidityMeasure = dht22.read_value()
-        lightMeasure = light.read_value()
         waterLevelMeasure = waterLevel.read_value()
 
         print("----------------------ATUANDO-------------------------")
@@ -88,13 +88,15 @@ class GreenhouseService():
             relays["light"].turn_off()
             actions.append("Luzes desligadas")
 
-        if lightMeasure < 100 and isSupposedToBeOn:
-            print("Alerta - Luz está desligada indevidamente")
-            ntfyService.send_notification("A luz está apagada e deveria estar acesa!", "Alerta - Luz com defeito!", "max", "rotating_light")
-
         if not waterLevelMeasure:
             print("Alerta - Nível de água baixo")
             ntfyService.send_notification("O nível da água esta baixo!", "Alerta - Nível de água", "high", "warning")
+            
+        time.sleep(1)
+        lightMeasure = light.read_value()
+        if lightMeasure < 100 and isSupposedToBeOn:
+            print("Alerta - Luz está desligada indevidamente")
+            ntfyService.send_notification("A luz está apagada e deveria estar acesa!", "Alerta - Luz com defeito!", "max", "rotating_light")
 
         actions_text = '\n'.join(actions)
         ntfyService.send_notification(
@@ -108,5 +110,31 @@ pH: {phMeasure}
 As seguintes ações foram tomadas:
 {actions_text}""", "Relatório Periódico", "default", "memo")
         print("----------------FIM MANUTENCAO------------------")
+
+    def turning_light_fan_on(self):
+        temperatureMeasure, humidityMeasure = dht22.read_value()
+
+        if temperatureMeasure > -1:
+            humidity_max, temperature_max = limitService.get_limit("humidity_max")[2], limitService.get_limit("temperature_max")[2]
+            print(f"Limites máximo de temperatura e humidade - Temperatura: {temperature_max}ºC | Himidade: {humidity_max}%")
+            if temperatureMeasure > temperature_max or humidityMeasure > humidity_max:
+                print(f"Temperatura e/ou humidade fora da faixa - {temperatureMeasure}ºC | {humidityMeasure}%")
+                relays["exhaustor"].turn_on()
+                relays["fan"].turn_on()
+            else:
+                print(f"Desligando exaustor e ventilador - {temperatureMeasure}ºC | {humidityMeasure}%")
+                relays["exhaustor"].turn_off()
+                relays["fan"].turn_off()
+        else:
+            ntfyService.send_notification("Ocorreu um erro ao ler a temperatura/humidade do ambiente!", "Alerta - Sensor com defeito!", "max", "rotating_light")
+
+        isSupposedToBeOn = lightService.isSupposedToBeOn()
+
+        if isSupposedToBeOn:
+            print("Luzes ligadas!")
+            relays["light"].turn_on()
+        else:
+            print("Luzes desligadas!")
+            relays["light"].turn_off()
             
 greenhouseService = GreenhouseService()
