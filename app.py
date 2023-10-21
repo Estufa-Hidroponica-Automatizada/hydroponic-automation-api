@@ -267,7 +267,7 @@ def get_profiles():
         return jsonify(profiles), 200
     elif request.method == 'POST':
         data = request.get_json()
-        profileService.insert_profile(data['name'], data['temperature_min'], data['temperature_max'], data['humidity_min'], data['humidity_max'], data['ph_min'], data['ph_max'], data['ec_min'], data['ec_max'], data['water_temperature_min'], data['water_temperature_max'], data['light_schedule'], data['nutrient_proportion'])
+        profileService.insert_profile(data['name'], data['temperature'], data['humidity'], data['ph'], data['ec'], data['water_temperature'], data['light_schedule'], data['nutrient_proportion'])
         return jsonify({"result": True}), 200
 
 @app.route('/profile/<id>', methods=['GET', 'DELETE', 'PUT'])
@@ -275,7 +275,7 @@ def get_profiles():
 def action_profile(id):
     if request.method == 'PUT':
         data = request.get_json()
-        profileService.update_profile(id, data['name'], data['temperature_min'], data['temperature_max'], data['humidity_min'], data['humidity_max'], data['ph_min'], data['ph_max'], data['ec_min'], data['ec_max'], data['water_temperature_min'], data['water_temperature_max'], data['light_schedule'], data['nutrient_proportion'])
+        profileService.update_profile(id, data['name'], data['temperature'], data['humidity'], data['ph'], data['ec'], data['water_temperature'], data['light_schedule'], data['nutrient_proportion'])
         profileService.update_limits_for_days_by_profile()
         return jsonify({"result": True}), 200
     elif request.method == 'DELETE':
