@@ -12,7 +12,7 @@ class ProfileService():
         self.current_profile = databaseService.get_current_profile()
     
     def update_profile(self, id, name, temperature, humidity, ph, ec, water_temperature, light_schedule, nutrient_proportion):
-        light_schedule_list = [[[entry["hour"], entry["minute"], entry["state"]] for entry in week] for week in light_schedule]
+        light_schedule_list = [[[entry["hour"], entry["minute"], 1 if entry["state"] else 0] for entry in week] for week in light_schedule]
         nutrient_proportion_list = [[entry["nutrientA"], entry["nutrientB"]] for entry in nutrient_proportion]
         temperature_min, temperature_max = self.build_list_from_object_limits(temperature)
         humidity_min, humidity_max = self.build_list_from_object_limits(humidity)
@@ -24,7 +24,7 @@ class ProfileService():
         return True
     
     def insert_profile(self, name, temperature, humidity, ph, ec, water_temperature, light_schedule, nutrient_proportion):
-        light_schedule_list = [[[entry["hour"], entry["minute"], entry["state"]] for entry in week] for week in light_schedule]
+        light_schedule_list = [[[entry["hour"], entry["minute"], 1 if entry["state"] else 0] for entry in week] for week in light_schedule]
         nutrient_proportion_list = [[entry["nutrientA"], entry["nutrientB"]] for entry in nutrient_proportion]
         temperature_min, temperature_max = self.build_list_from_object_limits(temperature)
         humidity_min, humidity_max = self.build_list_from_object_limits(humidity)
@@ -102,7 +102,7 @@ class ProfileService():
             "temperature":  self.build_list_limits(ast.literal_eval(profile_list[2]), ast.literal_eval(profile_list[3])),
             "humidity":  self.build_list_limits(ast.literal_eval(profile_list[4]), ast.literal_eval(profile_list[5])),
             "ph":  self.build_list_limits(ast.literal_eval(profile_list[6]), ast.literal_eval(profile_list[7])),
-            "ec":  self.build_list_limits(ast.literal_eval(profile_list[8]), ast.literal_eval(profile_list[9])),
+            "condutivity":  self.build_list_limits(ast.literal_eval(profile_list[8]), ast.literal_eval(profile_list[9])),
             "water_temperature":  self.build_list_limits(ast.literal_eval(profile_list[10]), ast.literal_eval(profile_list[11])),
             "light_schedule":  self._from_list_to_light_schedule(ast.literal_eval(profile_list[12])),
             "nutrient_proportion":  self._from_list_to_nutrient_proportion(ast.literal_eval(profile_list[13]))
@@ -124,7 +124,7 @@ class ProfileService():
     def _from_list_to_light_schedule(self, input_data):
         light_schedule = []
         for week in input_data:
-            week_data = [{"hour": entry[0], "minute": entry[1], "state": entry[2]} for entry in week]
+            week_data = [{"hour": entry[0], "minute": entry[1], "state": entry[2] == 1} for entry in week]
             light_schedule.append(week_data)
         return light_schedule
     

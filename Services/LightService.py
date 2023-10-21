@@ -8,12 +8,12 @@ class LightService():
         self.schedule = databaseService.fetch_light_schedule()
     
     def update_schedule(self, id, hour, minute, state):
-        databaseService.update_schedule(id, hour, minute, state)
+        databaseService.update_schedule(id, hour, minute, 1 if state else 0)
         self.schedule = databaseService.fetch_light_schedule()
         return True
     
     def insert_schedule(self, hour, minute, state):
-        databaseService.insert_schedule(hour, minute, state)
+        databaseService.insert_schedule(hour, minute, 1 if state else 0)
         self.schedule = databaseService.fetch_light_schedule()
         return True
     
@@ -48,7 +48,7 @@ class LightService():
     def _from_list_to_light_schedule(self, input_data):
         light_schedule = []
         for entry in input_data:
-            light_schedule.append({"hour": entry[1], "minute": entry[2], "state": entry[3]})
+            light_schedule.append({"hour": entry[1], "minute": entry[2], "state": entry[3] == 1})
         return light_schedule
 
 lightService = LightService()
