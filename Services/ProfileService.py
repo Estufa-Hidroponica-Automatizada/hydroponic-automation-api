@@ -115,11 +115,13 @@ class ProfileService():
         return [{"min": limits[0], "max": limits[1]} for limits in zip(limit_min, limit_max)]
     
     def build_current_profile_object(self, current_profile_list):
+        profile_data = databaseService.get_profile(current_profile_list[0])
         return {
             "id": current_profile_list[0],
             "days": current_profile_list[1],
             "isFinished": current_profile_list[2] == 1,
-            "name": databaseService.get_profile(current_profile_list[0])[1]
+            "name": profile_data[1],
+            "totalWeeks": len(ast.literal_eval(profile_data[2]))
         }
     
     def _from_list_to_light_schedule(self, input_data):
