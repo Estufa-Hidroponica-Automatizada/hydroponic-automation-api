@@ -118,7 +118,8 @@ class ProfileService():
         return {
             "id": current_profile_list[0],
             "days": current_profile_list[1],
-            "isFinished": current_profile_list[2] == 1
+            "isFinished": current_profile_list[2] == 1,
+            "name": databaseService.get_profile(current_profile_list[0])[1]
         }
     
     def _from_list_to_light_schedule(self, input_data):
