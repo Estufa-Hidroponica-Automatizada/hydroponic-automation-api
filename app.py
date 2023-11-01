@@ -115,7 +115,7 @@ def read_sensors():
 @app.route('/sensor/<sensor>', methods=['GET']) # Retorna o valor medido no sensor passado
 #@jwt_required()
 def read_sensor(sensor):
-    if sensor == "air-temperature":
+    if sensor == "airTemperature":
         return jsonify({"value": dht22.read_value()[0]}), 200
     elif sensor == "humidity":
         return jsonify({"value": dht22.read_value()[1]}), 200
@@ -125,9 +125,9 @@ def read_sensor(sensor):
         return jsonify({"value": ph.read_value()}), 200
     elif sensor == "light":
         return jsonify({"value": light.read_value()}), 200
-    elif sensor == "water-level":
+    elif sensor == "waterLevel":
         return jsonify({"value": waterLevel.read_value()}), 200
-    elif sensor == "water-temperature":
+    elif sensor == "waterTemperature":
         return jsonify({"value": waterTemp.read_value()}), 200
     return jsonify({'success': False, 'message': 'Invalid sensor'}), 400
 
@@ -147,21 +147,23 @@ def get_limits():
 #@jwt_required()
 def get_limit(value):
     if request.method == 'GET':
-        if value == "air-temperature":
+        if value == "airTemperature":
             return jsonify({'max': limitService.get_limit("temperature_max")[2], 'min': limitService.get_limit("temperature_min")[2]}), 200
         elif value == "humidity":
             return jsonify({'max': limitService.get_limit("humidity_max")[2], 'min': limitService.get_limit("humidity_min")[2]}), 200
         elif value == "condutivity":
             return jsonify({'max': limitService.get_limit("ec_max")[2], 'min': limitService.get_limit("ec_min")[2]}), 200
-        elif value == "ph":
+        elif value == "pH":
             return jsonify({'max': limitService.get_limit("ph_max")[2], 'min': limitService.get_limit("ph_min")[2]}), 200
-        elif value == "water-temperature":
+        elif value == "waterTemperature":
             return jsonify({'max': limitService.get_limit("water_temperature_max")[2], 'min': limitService.get_limit("water_temperature_min")[2]}), 200
         return jsonify({'success': False, 'message': "Invalid sensor"}), 400
     elif request.method == 'PUT':
         data = request.get_json()
         try:
+            profileService.update_profile_limit(str(value).lower()+"_min", data["min"])
             limitService.set_limit(value+"_min", data["min"])
+            profileService.update_profile_limit(str(value).lower()+"_max", data["max"])
             limitService.set_limit(value+"_max", data["max"])
             return jsonify({'success': True}), 200
         except:
@@ -203,7 +205,7 @@ def func_nutrients():
 #@jwt_required()
 def cam_endpoint(action):
     if action == 'photo':
-        photo_bytes = webcamService.get_save_photo()
+        photo_bytes = webcamService.get_save_photo(save=False)
         if not photo_bytes: return jsonify({"result": False}), 500
         return send_file(io.BytesIO(photo_bytes),
                          mimetype='image/jpeg',
@@ -267,7 +269,7 @@ def get_profiles():
         return jsonify(profiles), 200
     elif request.method == 'POST':
         data = request.get_json()
-        profileService.insert_profile(data['name'], data['temperature'], data['humidity'], data['ph'], data['condutivity'], data['water_temperature'], data['light_schedule'], data['nutrient_proportion'])
+        profileService.insert_profile(data['name'], data['temperature'], data['humidity'], data['pH'], data['condutivity'], data['waterTmperature'], data['lightSchedule'], data['nutrientProportion'])
         return jsonify({"result": True}), 200
 
 @app.route('/profile/<id>', methods=['GET', 'DELETE', 'PUT'])
@@ -275,14 +277,19 @@ def get_profiles():
 def action_profile(id):
     if request.method == 'PUT':
         data = request.get_json()
-        profileService.update_profile(id, data['name'], data['temperature'], data['humidity'], data['ph'], data['condutivity'], data['water_temperature'], data['light_schedule'], data['nutrient_proportion'])
+        profileService.update_profile(id, data['name'], data['temperature'], data['humidity'], data['pH'], data['condutivity'], data['waterTemperature'], data['lightSchedule'], data['nutrientProportion'])
         profileService.update_limits_for_days_by_profile()
         return jsonify({"result": True}), 200
     elif request.method == 'DELETE':
+        if id == profileService.get_current_profile()[0]:
+            return jsonify({"result": False, "message": "it's not possible to delete the current profile"}), 403
         profileService.delete_profile(id)
         return jsonify({"result": True}), 200
     elif request.method == 'GET':
-        return jsonify(profileService.build_profile_object(profileService.get_profile(id))), 200
+        profile = profileService.get_profile(id)
+        if profile == None:
+            return jsonify({"result": False, "message": "Profile not found"}), 400
+        return jsonify(profileService.build_profile_object(profile)), 200
 
 @app.route('/profile/current', methods=['GET', 'POST'])
 #@jwt_required()
@@ -295,7 +302,7 @@ def ongoing_profile():
         profileService.update_limits_for_days_by_profile()
         return jsonify({"result": True}), 200
     elif request.method == 'GET':
-        return jsonify(profileService.build_current_profile_object(profileService.current_profile)), 200
+        return jsonify(profileService.build_current_profile_object(profileService.get_current_profile())), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port='3000')
+    app.run(debug=True, host='0.0.0.0', port='4000')

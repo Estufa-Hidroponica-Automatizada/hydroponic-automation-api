@@ -53,18 +53,21 @@ class WebcamService:
         # Return the video data as bytes
         return video_data
     
-    def get_save_photo(self):
+    def get_save_photo(self, save = True):
         print("Fotografando ambiente")
         lightInitialState = relays["light"].get_state()
         if not lightInitialState:
             relays["light"].turn_on()
             time.sleep(0.5)
         
-        photo_bytes = self.get_photo()
-        if photo_bytes:
-            photoName = str((time.time() * 1000)).replace(".", "")
-            with open(f"./photos/{photoName}.jpg", "wb") as f:
-                f.write(photo_bytes)
+        try:
+            photo_bytes = self.get_photo()
+            if photo_bytes and save:
+                photoName = str((time.time() * 1000)).replace(".", "")
+                with open(f"./photos/{photoName}.jpg", "wb") as f:
+                    f.write(photo_bytes)
+        except:
+            print("Erro ao capturar foto!")
         
         if not lightInitialState: 
             relays["light"].turn_off()
