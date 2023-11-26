@@ -36,17 +36,33 @@ app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 MONITORING_INTERVAL = 600
 UPDATING_INTERVAL = 3600
 
+# Flag to indicate if the job is currently running
+monitoring_job_running = False
+updating_job_running = False
+
 @scheduler.task('interval', id='monitoring', seconds=MONITORING_INTERVAL)
 def maintain_greenhouse():
-    databaseService.set_job_runtime('monitoring', str(datetime.now()))
-    greenhouseService.maintaince()
+    global monitoring_job_running
+    if not monitoring_job_running:
+        monitoring_job_running = True
+        try:
+            databaseService.set_job_runtime('monitoring', str(datetime.now()))
+            greenhouseService.maintaince()
+        finally:
+            monitoring_job_running = False
 
-@scheduler.task('interval', id='updating', seconds=UPDATING_INTERVAL) # 86400 1 vez ao dia
+@scheduler.task('interval', id='updating', seconds=UPDATING_INTERVAL)
 def daily_update():
-    databaseService.set_job_runtime('updating', str(datetime.now()))
-    webcamService.get_save_photo()
-    profileService.add_day()
-    profileService.update_limits_for_days_by_profile()
+    global updating_job_running
+    if not updating_job_running:
+        updating_job_running = True
+        try:
+            databaseService.set_job_runtime('updating', str(datetime.now()))
+            webcamService.get_save_photo()
+            profileService.add_day()
+            profileService.update_limits_for_days_by_profile()
+        finally:
+            updating_job_running = False
 
 # Recupere os horários da última execução para cada job do banco de dados
 greenhouseService.turning_light_fan_on()
@@ -259,6 +275,18 @@ def logout():
     unset_jwt_cookies(resp)
     return resp, 200
 
+@app.route('/job/<id>', methods=['POST'])
+#@jwt_required()
+def run_job(id):
+    if id == 'monitoring':
+        maintain_greenhouse()
+        return jsonify({"result": True}), 200
+    elif id == 'updating':
+        daily_update()
+        return jsonify({"result": True}), 200
+    else: 
+        return jsonify({"result": False, "message": "Invalid id, options: monitoring or updating"}), 400
+
 @app.route('/profile', methods=['GET', 'POST'])
 #@jwt_required()
 def get_profiles():
@@ -269,7 +297,7 @@ def get_profiles():
         return jsonify(profiles), 200
     elif request.method == 'POST':
         data = request.get_json()
-        profileService.insert_profile(data['name'], data['temperature'], data['humidity'], data['pH'], data['condutivity'], data['waterTmperature'], data['lightSchedule'], data['nutrientProportion'])
+        profileService.insert_profile(data['name'], data['temperature'], data['humidity'], data['pH'], data['condutivity'], data['waterTemperature'], data['lightSchedule'], data['nutrientProportion'])
         return jsonify({"result": True}), 200
 
 @app.route('/profile/<id>', methods=['GET', 'DELETE', 'PUT'])

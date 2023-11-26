@@ -36,9 +36,7 @@ class LightService():
 
         for row in self.schedule:
             id, hour, minute, state = row
-
             time_diff = (current_hour - hour) * 60 + (current_minute - minute)
-
             if latest_time_diff is None or (time_diff < latest_time_diff and (latest_time_diff >= 0 and time_diff >= 0) or (latest_time_diff < 0 and time_diff < 0)):
                 latest_state = state
                 latest_time_diff = time_diff

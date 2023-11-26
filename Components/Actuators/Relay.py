@@ -7,11 +7,11 @@ class Relay():
         self.pin = pin
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin, GPIO.OUT)
-        GPIO.output(self.pin, GPIO.LOW)
+        GPIO.output(self.pin, GPIO.HIGH)
         self.state = False
 
     def turn_on(self):
-        GPIO.output(self.pin, GPIO.HIGH)
+        GPIO.output(self.pin, GPIO.LOW)
         self.state = True
 
     def turn_on_for(self, seconds):
@@ -20,7 +20,7 @@ class Relay():
         self.turn_off()
 
     def turn_off(self):
-        GPIO.output(self.pin, GPIO.LOW)
+        GPIO.output(self.pin, GPIO.HIGH)
         self.state = False
 
     def get_state(self):

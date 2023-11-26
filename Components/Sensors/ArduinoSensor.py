@@ -5,18 +5,22 @@ class ArduinoSensor():
         self.ser = Serial(sensor_folder, 9600)
 
     def get_data_from_arduino(self):
-        self.ser.write('R'.encode())
+        try:
+            self.ser.write('R'.encode())
 
-        data = None
-        tries = 0
-        data_return = -1, -1, -1
-        while tries < 5:
-            tries += 1
-            data = self.ser.readline().decode().strip()  # Lê uma linha da porta serial
-            if data:
-                data_return = data.split(',')
-                if len(data_return) == 4:
-                    return data_return
-        return data_return
+            data = None
+            tries = 0
+            data_return = -1, -1, -1, -1
+            while tries < 5:
+                tries += 1
+                data = self.ser.readline().decode().strip()  # Lê uma linha da porta serial
+                if data:
+                    data_return = data.split(',')
+                    if len(data_return) == 4:
+                        return data_return
+            return data_return
+        except:
+            print("Erro ao ler/escrever na porta serial do Arduino")
+            return -1, -1, -1, -1
     
 arduinoSensor = ArduinoSensor('/dev/ttyACM0')
