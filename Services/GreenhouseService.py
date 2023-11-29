@@ -112,6 +112,7 @@ As seguintes ações foram tomadas:
         print("----------------FIM MANUTENCAO------------------")
 
     def turning_light_fan_on(self):
+        time.sleep(2)
         temperatureMeasure, humidityMeasure = dht22.read_value()
 
         if temperatureMeasure > -1:

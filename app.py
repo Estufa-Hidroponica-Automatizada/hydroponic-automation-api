@@ -4,6 +4,7 @@ from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from Components.Sensors.DHT22 import dht22
+from Components.Sensors.ArduinoSensor import arduinoSensor
 from Components.Sensors.EC import ec
 from Components.Sensors.Light import light
 from Components.Sensors.PH import ph
@@ -117,15 +118,15 @@ def set_actuators_for(value, seconds):
 @app.route('/sensor', methods=['GET']) # Retorna todos os valores medidos nos sensores
 #@jwt_required()
 def read_sensors():
-    temp, humidity = dht22.read_value()
+    lightValue, waterTempValue, tdsValue, phValue, tempValue, humidityValue = arduinoSensor.get_data_from_arduino()
     return jsonify({
-        "airTemperature": temp,
-        "humidity": humidity,
-        "waterTemperature": waterTemp.read_value(),
-        "pH": ph.read_value(),
-        "condutivity": ec.read_value(),
+        "airTemperature": float(tempValue),
+        "humidity": float(humidityValue),
+        "waterTemperature": float(waterTempValue),
+        "pH": float(phValue),
+        "condutivity": int(tdsValue),
         "waterLevel": waterLevel.read_value(),
-        "light": light.read_value()
+        "light": int(lightValue)
     }), 200
 
 @app.route('/sensor/<sensor>', methods=['GET']) # Retorna o valor medido no sensor passado
