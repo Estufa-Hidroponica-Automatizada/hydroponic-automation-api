@@ -46,7 +46,15 @@ flask run
 
 # How to deploy on local server
 
-All is configured in ```gunicorn_config.py```: ip, port and number of workers, you can change the default configuration there, then you can run:
+You need a ```server.crt``` and a ```server.key``` files in root to host a valid HTTPS server, if that's not what you want you need to remove the following code from ```gunicorn_config.py```:
+
+```
+keyfile = '/home/rasp/hydroponic-automation-api/server.key'
+certfile = '/home/rasp/hydroponic-automation-api/server.crt' 
+```
+
+
+Everything else is configured in ```gunicorn_config.py```: ip, port and number of workers, you can change the default configuration there, then you can run:
 
 ```
 gunicorn -c gunicorn_config.py app:app
