@@ -1,6 +1,23 @@
 # hydroponic-automation-api
 Respository for the Flask API behind an autonomous hydroponic plantantion made with Raspberry Pi
 
+# First steps
+
+1. Set all pins correctly:
+
+| Sensor            | Connection             |
+|-------------------|------------------------|
+| DHT22             | Arduino Digital 3      |
+| TDS               | Arduino Analog 3       |
+| Light             | Arduino Analog 2       |
+| pH                | Arduino Analog 0       |
+| Water Level       | Raspberry GPIO 24      |
+| Water Temperature | Arduino Digital 2      |
+
+2. Run ```arduino_estufa.ino``` into your Arduino.
+3. Connect Arduino and your Webcam into Raspberry's USB ports.
+
+
 # How to run for development
 
 First, install all dependecies using:
@@ -38,19 +55,3 @@ gunicorn -c gunicorn_config.py app:app
 And everything should be up and running.
 
 > **Remember**: this only runs the server locally, you may access it from local network, if you need to access it remotely make sure to make the adequate port-forwarding in your router, and fixing the working machine ip.
-
-# How to connect each sensor
-
-> **IMPORTANT**: Make sure every pin in Raspberry and code are defined correctly! Wrong setup may cause damage to your sensors or even to the Raspberry
-
-### DHT22
-
-### EC
-
-### pH
-
-### Light
-
-### Water Level
-
-### Water Temperature
