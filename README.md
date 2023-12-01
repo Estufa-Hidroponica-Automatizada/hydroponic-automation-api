@@ -44,6 +44,10 @@ And finally:
 flask run
 ```
 
+## Local Testing
+
+Import ```ApiEstufa.postman_collection.json``` into Postman all endpoints on your service can be tested directly.
+
 # How to deploy on local server
 
 You need a ```server.crt``` and a ```server.key``` files in root to host a valid HTTPS server, if that's not what you want you need to remove the following code from ```gunicorn_config.py```:
