@@ -14,6 +14,17 @@ Respository for the Flask API behind an autonomous hydroponic plantantion made w
 | Water Level       | Raspberry GPIO 24      |
 | Water Temperature | Arduino Digital 2      |
 
+
+| Actuator          | Connection             |
+|-------------------|------------------------|
+| Nutrient Pump A   | Raspberry GPIO 26      |
+| Nutrient Pump B   | Raspberry GPIO 16      |
+| Nutrient pH-      | Raspberry GPIO 6       |
+| Nutrient pH+      | Raspberry GPIO 5       |
+| Fan               | Raspberry GPIO 27      |
+| Exhaustor         | Raspberry GPIO 22      |
+| Light             | Raspberry GPIO 17      |
+
 2. Run ```arduino_estufa.ino``` into your Arduino.
 3. Connect Arduino and your Webcam into Raspberry's USB ports.
 
