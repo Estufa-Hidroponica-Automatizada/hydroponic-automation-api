@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import io
 import os
-from flask import Flask, jsonify, make_response, request, send_file
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from Components.Sensors.DHT22 import dht22
@@ -22,13 +22,13 @@ from Services.ProfileService import profileService
 from Services.DatabaseService import databaseService
 
 from flask_apscheduler import APScheduler
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, unset_jwt_cookies
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from dotenv import load_dotenv 
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app,supports_credentials=True, origins=os.getenv('CORS_ORIGINS', '*'))
+CORS(app,supports_credentials=True, origins=os.getenv('CORS_ORIGINS', '*').split(','))
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 scheduler = APScheduler()
@@ -36,8 +36,6 @@ scheduler.init_app(app)
 scheduler.start()
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'jwt_fallback_key')
-app.config['JWT_TOKEN_LOCATION'] = ['cookies']
-app.config['JWT_COOKIE_CSRF_PROTECT'] = False 
 MONITORING_INTERVAL = 1800 # 30 minutes
 UPDATING_INTERVAL = 3600 * 24 # 24 hours
 
@@ -265,20 +263,15 @@ def login():
     user_data = databaseService.get_user_info()
 
     if username == user_data['username'] and bcrypt.check_password_hash(user_data['password'], password):
-        access_token = create_access_token(user_data['username'])
-        resp = make_response(jsonify({'success': True}))
-        unset_jwt_cookies(resp)
-        resp.set_cookie('access_token_cookie', access_token, httponly=True, secure=True, samesite='None')
-        return resp, 200
+        access_token = create_access_token(user_data['username'], expires_delta=timedelta(hours=1)) 
+        return jsonify({'access_token': access_token}), 200
     else:
         return jsonify({'success': False, "message": "Incorret data"}), 401
 
 @app.route('/logout', methods=['POST']) # faz logout
 @jwt_required()
 def logout():
-    resp = make_response(jsonify({'success': True}))
-    unset_jwt_cookies(resp)
-    return resp, 200
+    return jsonify({'success': True}), 200
 
 @app.route('/job/<id>', methods=['POST'])
 @jwt_required()
