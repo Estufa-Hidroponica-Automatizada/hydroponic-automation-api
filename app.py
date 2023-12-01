@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import io
+import os
 from flask import Flask, jsonify, make_response, request, send_file
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -22,20 +23,23 @@ from Services.DatabaseService import databaseService
 
 from flask_apscheduler import APScheduler
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, unset_jwt_cookies
+from dotenv import load_dotenv 
+
+load_dotenv()
 
 app = Flask(__name__)
-CORS(app,supports_credentials=True)
+CORS(app,supports_credentials=True, origins=os.getenv('CORS_ORIGINS', '*'))
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
 
-app.config['JWT_SECRET_KEY'] = 'seu_segredo_super_secreto'
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'jwt_fallback_key')
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False 
-MONITORING_INTERVAL = 600
-UPDATING_INTERVAL = 3600
+MONITORING_INTERVAL = 1800 # 30 minutes
+UPDATING_INTERVAL = 3600 * 24 # 24 hours
 
 # Flag to indicate if the job is currently running
 monitoring_job_running = False
@@ -87,12 +91,12 @@ if monitoring_time_str != '' and updating_time_str != '':
     print(f'Proximas execuções definidas para monitoring: {next_execution_time_monitoring} | updating: {next_execution_time_updating}')
 
 @app.route('/actuator', methods=['GET']) # Retorna todos os estados dos atuadores
-#@jwt_required()
+@jwt_required()
 def get_actuators():
     return jsonify({key: relays[key].get_state() for key in relays.keys()}), 200
 
 @app.route('/actuator/<value>/<action>', methods=['POST']) # Retorna todos os estados dos atuadores
-#@jwt_required()
+@jwt_required()
 def set_actuators(value, action):
     if value not in relays.keys():
         return jsonify({ "result": False, "message": "Atuador fornecido não é válido." }), 400
@@ -105,7 +109,7 @@ def set_actuators(value, action):
     return jsonify({ "result": True }), 200
 
 @app.route('/actuator/<value>/on_for/<seconds>', methods=['POST']) # Retorna todos os estados dos atuadores
-#@jwt_required()
+@jwt_required()
 def set_actuators_for(value, seconds):
     if not seconds.isnumeric():
         return jsonify({ "result": False, "message": "Segundos fornecidos não é um valor válido" }), 400
@@ -116,7 +120,7 @@ def set_actuators_for(value, seconds):
 
 
 @app.route('/sensor', methods=['GET']) # Retorna todos os valores medidos nos sensores
-#@jwt_required()
+@jwt_required()
 def read_sensors():
     lightValue, waterTempValue, tdsValue, phValue, tempValue, humidityValue = arduinoSensor.get_data_from_arduino()
     return jsonify({
@@ -130,7 +134,7 @@ def read_sensors():
     }), 200
 
 @app.route('/sensor/<sensor>', methods=['GET']) # Retorna o valor medido no sensor passado
-#@jwt_required()
+@jwt_required()
 def read_sensor(sensor):
     if sensor == "airTemperature":
         return jsonify({"value": dht22.read_value()[0]}), 200
@@ -149,7 +153,7 @@ def read_sensor(sensor):
     return jsonify({'success': False, 'message': 'Invalid sensor'}), 400
 
 @app.route('/limit', methods=['GET']) # Retorna a lista de limites
-#@jwt_required()
+@jwt_required()
 def get_limits():
     data = {
         "airTemperature": {'max': limitService.get_limit("temperature_max")[2], 'min': limitService.get_limit("temperature_min")[2]},
@@ -161,7 +165,7 @@ def get_limits():
     return jsonify(data), 200
 
 @app.route('/limit/<value>', methods=['GET', 'PUT']) # Retorna o valor do limite passado | Seta valor do limite passado
-#@jwt_required()
+@jwt_required()
 def get_limit(value):
     if request.method == 'GET':
         if value == "airTemperature":
@@ -188,7 +192,7 @@ def get_limit(value):
     
 
 @app.route('/light/schedule', methods=['GET', 'POST']) # Altera horario existente | Adiciona horario novo
-#@jwt_required()
+@jwt_required()
 def light_schedule():
     if request.method == 'GET':
         return jsonify(lightService._from_list_to_light_schedule(lightService.schedule))
@@ -198,7 +202,7 @@ def light_schedule():
         return jsonify({"result": True}), 200
     
 @app.route('/light/schedule/<id>', methods=['PUT', 'DELETE']) # pega horario existente | deleta horario existente
-#@jwt_required()
+@jwt_required()
 def light_schedule_id(id):
     if request.method == 'PUT':
         data = request.get_json()
@@ -209,7 +213,7 @@ def light_schedule_id(id):
         return jsonify({"result": True}), 200
     
 @app.route('/nutrient/proportion', methods=['GET', 'PUT']) # Pega e atualiza porporção de nutrientes
-#@jwt_required()
+@jwt_required()
 def func_nutrients():
     if request.method == 'GET':
         return jsonify({"nutrientA":nutrientService.nutrients[0], "nutrientB":nutrientService.nutrients[1]})
@@ -219,7 +223,7 @@ def func_nutrients():
         return jsonify({"result": True}), 200
 
 @app.route('/cam/<action>', methods=['GET']) # retorna foto/stream/timelapse da estufa
-#@jwt_required()
+@jwt_required()
 def cam_endpoint(action):
     if action == 'photo':
         photo_bytes = webcamService.get_save_photo(save=False)
@@ -240,7 +244,7 @@ def cam_endpoint(action):
         return jsonify({"result": False, 'message': "Invalid action. Use 'photo' or 'timelapse'"}), 400
 
 @app.route('/change-password', methods=['POST']) # muda senha
-#@jwt_required()
+@jwt_required()
 def changePassword():
     data = request.get_json()
     old_password = data.get('oldPassword')
@@ -270,14 +274,14 @@ def login():
         return jsonify({'success': False, "message": "Incorret data"}), 401
 
 @app.route('/logout', methods=['POST']) # faz logout
-#@jwt_required()
+@jwt_required()
 def logout():
     resp = make_response(jsonify({'success': True}))
     unset_jwt_cookies(resp)
     return resp, 200
 
 @app.route('/job/<id>', methods=['POST'])
-#@jwt_required()
+@jwt_required()
 def run_job(id):
     if id == 'monitoring':
         maintain_greenhouse()
@@ -289,7 +293,7 @@ def run_job(id):
         return jsonify({"result": False, "message": "Invalid id, options: monitoring or updating"}), 400
 
 @app.route('/profile', methods=['GET', 'POST'])
-#@jwt_required()
+@jwt_required()
 def get_profiles():
     if request.method == 'GET':
         profiles = []
@@ -302,7 +306,7 @@ def get_profiles():
         return jsonify({"result": True}), 200
 
 @app.route('/profile/<id>', methods=['GET', 'DELETE', 'PUT'])
-#@jwt_required()
+@jwt_required()
 def action_profile(id):
     if request.method == 'PUT':
         data = request.get_json()
@@ -321,7 +325,7 @@ def action_profile(id):
         return jsonify(profileService.build_profile_object(profile)), 200
 
 @app.route('/profile/current', methods=['GET', 'POST'])
-#@jwt_required()
+@jwt_required()
 def ongoing_profile():
     if request.method == 'POST':
         data = request.get_json()
