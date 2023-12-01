@@ -19,8 +19,8 @@ Respository for the Flask API behind an autonomous hydroponic plantantion made w
 |-------------------|------------------------|
 | Nutrient Pump A   | Raspberry GPIO 26      |
 | Nutrient Pump B   | Raspberry GPIO 16      |
-| Nutrient pH-      | Raspberry GPIO 6       |
-| Nutrient pH+      | Raspberry GPIO 5       |
+| Pump pH-          | Raspberry GPIO 6       |
+| Pump pH+          | Raspberry GPIO 5       |
 | Fan               | Raspberry GPIO 27      |
 | Exhaustor         | Raspberry GPIO 22      |
 | Light             | Raspberry GPIO 17      |
