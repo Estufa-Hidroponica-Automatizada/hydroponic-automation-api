@@ -20,7 +20,7 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso do curso de E
 | Nível d'água                        | Raspberry GPIO 24 |
 
 
-| Actuator          | Connection        |
+| Atuador           | Conexão           |
 |:-----------------:|:-----------------:|
 | Bomba pH+         | Raspberry GPIO 5  |
 | Bomba pH-         | Raspberry GPIO 6  |
