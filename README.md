@@ -11,7 +11,7 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso do curso de E
 1. Conecte os pinos conforme tabelas abaixo:
 
 | Sensor                              | Conexão           |
-|-------------------------------------|-------------------|
+|:-----------------------------------:|:-----------------:|
 | pH (PH4502C)                        | Arduino Analog 0  |
 | Luminosidade (LDR)                  | Arduino Analog 2  |
 | Condutividade (TDS)                 | Arduino Analog 3  |
@@ -21,7 +21,7 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso do curso de E
 
 
 | Actuator          | Connection        |
-|-------------------|-------------------|
+|:-----------------:|:-----------------:|
 | Bomba pH+         | Raspberry GPIO 5  |
 | Bomba pH-         | Raspberry GPIO 6  |
 | Bomba Nutriente B | Raspberry GPIO 16 |
@@ -33,52 +33,39 @@ Este projeto foi desenvolvido como Trabalho de Conclusão de Curso do curso de E
 2. Carregue e execute o arquivo ```arduino_estufa.ino``` no seu Arduino.
 3. Conecte o Arduino e a Webcam nas portas USB do Raspberry.
 
-# How to run for development
-
-First, install all dependecies using:
-
+## Scripts
+### Dependências do projeto
+Antes de seguir para os próximos scripts, você primeiro deve instalar todas as dependências do projeto executando o seguinte comando:
 ```
 pip install -r requirements.txt
 ```
 
-then you can use:
-
+### Modo desenvolvedor
+Para rodar a API no modo desenvolvedor, basta executar o seguinte comando:
 ```
 python app.py
 ```
-
-Alternatively, you can define the Flask's enviroment variable using:
-
+Como alternativa, você pode definir a variável de ambiente do Flask da seguinte forma:
 ```
 export FLASK_APP=app.py
 ```
-
-And finally:
-
+Ao fazer isso, você poderá rodar (em modo desenvolvedor) com o comando:
 ```
 flask run
 ```
 
-## Local Testing
-
-Import ```ApiEstufa.postman_collection.json``` into Postman all endpoints on your service can be tested directly.
-
-# How to deploy on local server
-
-You need a ```server.crt``` and a ```server.key``` files in root to host a valid HTTPS server, if that's what you want you need to remove the commenting following code from ```gunicorn_config.py```:
-
+### Deploy
+Você precisará dos arquivos `server.crt` e `server.key` na raiz do seu projeto caso queira hostear um servidor HTTPS válido. Neste caso, basta descomentar as seguintes linhas no arquivo `gunicorn_config.py`:
 ```
 keyfile = '/home/rasp/hydroponic-automation-api/server.key'
 certfile = '/home/rasp/hydroponic-automation-api/server.crt' 
 ```
-
-
-Everything else is configured in ```gunicorn_config.py```: ip, port and number of workers, you can change the default configuration there, then you can run:
-
+Neste arquivo, também constam as demais configurações do servidor, que incluem IP, porta e número de workers. Após alterar as configurações (caso necessário), basta executar o seguinte comando para realizar o deploy no servidor local:
 ```
 gunicorn -c gunicorn_config.py app:app
 ```
 
-And everything should be up and running.
+> **Lembrete**: Isso só irá rodar o servidor localmente, permitindo o acesso pela rede local. Se você deseja acessar remotamente, configure adequadamente o redirecionamento de portas no seu roteador.
 
-> **Remember**: this only runs the server locally, you may access it from local network, if you need to access it remotely make sure to make the adequate port-forwarding in your router, and fixing the working machine ip.
+## Testes locais
+Para testar todos os endpoints implementados neste projeto pelo _Postman_, basta importar o arquivo `ApiEstufa.postman_collection.json`.
