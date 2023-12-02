@@ -1,675 +1,539 @@
 {
-	"info": {
-		"_postman_id": "58031ded-fe02-4fac-a2e1-2ba2b3b69dcd",
-		"name": "Estufa",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "17767468"
-	},
-	"item": [
-		{
-			"name": "Sensor",
-			"item": [
-				{
-					"name": "Sensor",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/sensor",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"sensor"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Sensor Especifico",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/sensor/light",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"sensor",
-								"light"
-							]
-						},
-						"description": "air-temperature\n\nhumidity\n\nec\n\nph\n\nlight\n\nwater-level\n\nwater-temperature"
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Profile",
-			"item": [
-				{
-					"name": "Profiles",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/profile",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"profile"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Current Profile",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/profile/current",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"profile",
-								"current"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Profile",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/profile/13",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"profile",
-								"13"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Set Current Profile",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"id\": 1,\n    \"days\": 0,\n    \"erase\": false\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{raspberry_url}}/profile/current",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"profile",
-								"current"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Perfil",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/profile/3",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"profile",
-								"3"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Perfil",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"PerfilC\",\n    \"temperature\": [\n        {\n            \"min\": 22,\n            \"max\": 27\n        },\n        {\n            \"min\": 25,\n            \"max\": 29\n        },\n        {\n            \"min\": 27,\n            \"max\": 31\n        }\n    ],\n    \"humidity\": [\n        {\n            \"min\": 40,\n            \"max\": 75\n        },\n        {\n            \"min\": 50,\n            \"max\": 80\n        },\n        {\n            \"min\": 55,\n            \"max\": 85\n        }\n    ],\n    \"ph\": [\n        {\n            \"min\": 6,\n            \"max\": 7\n        },\n        {\n            \"min\": 6.5,\n            \"max\": 7.1\n        },\n        {\n            \"min\": 6.5,\n            \"max\": 7.2\n        }\n    ],\n    \"condutivity\": [\n        {\n            \"min\": 500,\n            \"max\": 650\n        },\n        {\n            \"min\": 450,\n            \"max\": 600\n        },\n        {\n            \"min\": 600,\n            \"max\": 800\n        }\n    ],\n    \"water_temperature\": [\n        {\n            \"min\": 20,\n            \"max\": 25\n        },\n        {\n            \"min\": 23,\n            \"max\": 28\n        },\n        {\n            \"min\": 25,\n            \"max\": 30\n        }\n    ],\n    \"light_schedule\": [\n        [\n            {\n                \"hour\": 8,\n                \"minute\": 20,\n                \"state\": true\n            },\n            {\n                \"hour\": 20,\n                \"minute\": 0,\n                \"state\": false\n            }\n        ],\n        [\n            {\n                \"hour\": 7,\n                \"minute\": 0,\n                \"state\": true\n            },\n            {\n                \"hour\": 21,\n                \"minute\": 0,\n                \"state\": false\n            }\n        ],\n        [\n            {\n                \"hour\": 7,\n                \"minute\": 40,\n                \"state\": true\n            },\n            {\n                \"hour\": 20,\n                \"minute\": 45,\n                \"state\": false\n            }\n        ]\n    ],\n    \"nutrient_proportion\": [\n        {\n            \"nutrientA\": 2,\n            \"nutrientB\": 3\n        },\n        {\n            \"nutrientA\": 1,\n            \"nutrientB\": 1\n        },\n        {\n            \"nutrientA\": 2,\n            \"nutrientB\": 1\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{raspberry_url}}/profile",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"profile"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Perfil",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"PerfilC\",\n    \"temperature\": [\n        {\n            \"min\": 22,\n            \"max\": 27\n        },\n        {\n            \"min\": 25,\n            \"max\": 29\n        },\n        {\n            \"min\": 27,\n            \"max\": 31\n        }\n    ],\n    \"humidity\": [\n        {\n            \"min\": 40,\n            \"max\": 75\n        },\n        {\n            \"min\": 50,\n            \"max\": 80\n        },\n        {\n            \"min\": 55,\n            \"max\": 85\n        }\n    ],\n    \"pH\": [\n        {\n            \"min\": 0,\n            \"max\": 14\n        },\n        {\n            \"min\": 0,\n            \"max\": 14\n        },\n        {\n            \"min\": 0,\n            \"max\": 14\n        }\n    ],\n    \"condutivity\": [\n        {\n            \"min\": 400,\n            \"max\": 650\n        },\n        {\n            \"min\": 450,\n            \"max\": 600\n        },\n        {\n            \"min\": 600,\n            \"max\": 800\n        }\n    ],\n    \"waterTemperature\": [\n        {\n            \"min\": 20,\n            \"max\": 25\n        },\n        {\n            \"min\": 23,\n            \"max\": 28\n        },\n        {\n            \"min\": 25,\n            \"max\": 30\n        }\n    ],\n    \"lightSchedule\": [\n        [\n            {\n                \"hour\": 8,\n                \"minute\": 20,\n                \"state\": true\n            },\n            {\n                \"hour\": 20,\n                \"minute\": 0,\n                \"state\": false\n            }\n        ],\n        [\n            {\n                \"hour\": 7,\n                \"minute\": 0,\n                \"state\": true\n            },\n            {\n                \"hour\": 21,\n                \"minute\": 0,\n                \"state\": false\n            }\n        ],\n        [\n            {\n                \"hour\": 7,\n                \"minute\": 40,\n                \"state\": true\n            },\n            {\n                \"hour\": 20,\n                \"minute\": 45,\n                \"state\": false\n            }\n        ]\n    ],\n    \"nutrientProportion\": [\n        {\n            \"nutrientA\": 2,\n            \"nutrientB\": 3\n        },\n        {\n            \"nutrientA\": 1,\n            \"nutrientB\": 1\n        },\n        {\n            \"nutrientA\": 2,\n            \"nutrientB\": 1\n        }\n    ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{raspberry_url}}/profile/12",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"profile",
-								"12"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Limit",
-			"item": [
-				{
-					"name": "Limit",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/limit",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"limit"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Limite Específico",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"min\": 400,\n    \"max\": 600\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{raspberry_url}}/limit/condutivity",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"limit",
-								"condutivity"
-							]
-						},
-						"description": "temperature\n\nhumidity\n\nph\n\nec\n\nwater_temperature"
-					},
-					"response": []
-				},
-				{
-					"name": "Limite Específico",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/limit/pH",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"limit",
-								"pH"
-							]
-						},
-						"description": "temperature_min\n\ntemperature_max\n\nhumidity_min\n\nhumidity_max\n\nph_min\n\nph_max\n\nec_min\n\nec_max\n\nwater_temperature_min\n\nwater_temperature_max"
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Light",
-			"item": [
-				{
-					"name": "Light Schedule",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"hour\": 15,\n    \"minute\": 50,\n    \"state\": true\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{raspberry_url}}/light/schedule",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"light",
-								"schedule"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Light Schedule",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/light/schedule/3",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"light",
-								"schedule",
-								"3"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Light Schedule",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"hour\": 15,\n    \"minute\": 30,\n    \"state\": true\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{raspberry_url}}/light/schedule/3",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"light",
-								"schedule",
-								"3"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Light Schedule",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/light/schedule",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"light",
-								"schedule"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Nutrient",
-			"item": [
-				{
-					"name": "Nutrient Proportion",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/nutrient/proportion",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"nutrient",
-								"proportion"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Nutrient Proportion",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"nutrientA\": 5,\n    \"nutrientB\": 3\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{raspberry_url}}/nutrient/proportion",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"nutrient",
-								"proportion"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Auth",
-			"item": [
-				{
-					"name": "Login",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"user\",\n    \"password\": \"1234\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{raspberry_url}}/login",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{raspberry_url}}/logout",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"logout"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Change password",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"oldPassword\": \"1234\",\n    \"newPassword\": \"1234\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{raspberry_url}}/change-password",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"change-password"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Camera",
-			"item": [
-				{
-					"name": "Photo",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/cam/photo",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"cam",
-								"photo"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Timelapse",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/cam/timelapse",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"cam",
-								"timelapse"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Actuator",
-			"item": [
-				{
-					"name": "Actuator",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/actuator",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"actuator"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Actuator Set",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/actuator/exhaustor/off",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"actuator",
-								"exhaustor",
-								"off"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Actuator Set For",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/actuator/light/on_for/3",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"actuator",
-								"light",
-								"on_for",
-								"3"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Jobs",
-			"item": [
-				{
-					"name": "Maintaince Job",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{raspberry_url}}/job/maintance",
-							"host": [
-								"{{raspberry_url}}"
-							],
-							"path": [
-								"job",
-								"maintance"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "New Request",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		}
-	],
-	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "",
-				"type": "string"
-			}
-		]
-	},
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "raspberry_url",
-			"value": "http://177.45.94.138:3000"
-		}
-	]
+  "info": {
+    "_postman_id": "58031ded-fe02-4fac-a2e1-2ba2b3b69dcd",
+    "name": "Estufa",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "17767468"
+  },
+  "item": [
+    {
+      "name": "Sensor",
+      "item": [
+        {
+          "name": "Sensor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/sensor",
+              "host": ["{{raspberry_url}}"],
+              "path": ["sensor"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sensor Especifico",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/sensor/light",
+              "host": ["{{raspberry_url}}"],
+              "path": ["sensor", "light"]
+            },
+            "description": "air-temperature\n\nhumidity\n\nec\n\nph\n\nlight\n\nwater-level\n\nwater-temperature"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Profiles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/profile",
+              "host": ["{{raspberry_url}}"],
+              "path": ["profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Current Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/profile/current",
+              "host": ["{{raspberry_url}}"],
+              "path": ["profile", "current"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/profile/13",
+              "host": ["{{raspberry_url}}"],
+              "path": ["profile", "13"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Set Current Profile",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"days\": 0,\n    \"erase\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{raspberry_url}}/profile/current",
+              "host": ["{{raspberry_url}}"],
+              "path": ["profile", "current"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Perfil",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/profile/3",
+              "host": ["{{raspberry_url}}"],
+              "path": ["profile", "3"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Perfil",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"PerfilC\",\n    \"airTemperature\": [\n        {\n            \"min\": 22,\n            \"max\": 27\n        },\n        {\n            \"min\": 25,\n            \"max\": 29\n        },\n        {\n            \"min\": 27,\n            \"max\": 31\n        }\n    ],\n    \"humidity\": [\n        {\n            \"min\": 40,\n            \"max\": 75\n        },\n        {\n            \"min\": 50,\n            \"max\": 80\n        },\n        {\n            \"min\": 55,\n            \"max\": 85\n        }\n    ],\n    \"ph\": [\n        {\n            \"min\": 6,\n            \"max\": 7\n        },\n        {\n            \"min\": 6.5,\n            \"max\": 7.1\n        },\n        {\n            \"min\": 6.5,\n            \"max\": 7.2\n        }\n    ],\n    \"condutivity\": [\n        {\n            \"min\": 500,\n            \"max\": 650\n        },\n        {\n            \"min\": 450,\n            \"max\": 600\n        },\n        {\n            \"min\": 600,\n            \"max\": 800\n        }\n    ],\n    \"water_temperature\": [\n        {\n            \"min\": 20,\n            \"max\": 25\n        },\n        {\n            \"min\": 23,\n            \"max\": 28\n        },\n        {\n            \"min\": 25,\n            \"max\": 30\n        }\n    ],\n    \"light_schedule\": [\n        [\n            {\n                \"hour\": 8,\n                \"minute\": 20,\n                \"state\": true\n            },\n            {\n                \"hour\": 20,\n                \"minute\": 0,\n                \"state\": false\n            }\n        ],\n        [\n            {\n                \"hour\": 7,\n                \"minute\": 0,\n                \"state\": true\n            },\n            {\n                \"hour\": 21,\n                \"minute\": 0,\n                \"state\": false\n            }\n        ],\n        [\n            {\n                \"hour\": 7,\n                \"minute\": 40,\n                \"state\": true\n            },\n            {\n                \"hour\": 20,\n                \"minute\": 45,\n                \"state\": false\n            }\n        ]\n    ],\n    \"nutrient_proportion\": [\n        {\n            \"nutrientA\": 2,\n            \"nutrientB\": 3\n        },\n        {\n            \"nutrientA\": 1,\n            \"nutrientB\": 1\n        },\n        {\n            \"nutrientA\": 2,\n            \"nutrientB\": 1\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{raspberry_url}}/profile",
+              "host": ["{{raspberry_url}}"],
+              "path": ["profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Perfil",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"PerfilC\",\n    \"airTemperature\": [\n        {\n            \"min\": 22,\n            \"max\": 27\n        },\n        {\n            \"min\": 25,\n            \"max\": 29\n        },\n        {\n            \"min\": 27,\n            \"max\": 31\n        }\n    ],\n    \"humidity\": [\n        {\n            \"min\": 40,\n            \"max\": 75\n        },\n        {\n            \"min\": 50,\n            \"max\": 80\n        },\n        {\n            \"min\": 55,\n            \"max\": 85\n        }\n    ],\n    \"pH\": [\n        {\n            \"min\": 0,\n            \"max\": 14\n        },\n        {\n            \"min\": 0,\n            \"max\": 14\n        },\n        {\n            \"min\": 0,\n            \"max\": 14\n        }\n    ],\n    \"condutivity\": [\n        {\n            \"min\": 400,\n            \"max\": 650\n        },\n        {\n            \"min\": 450,\n            \"max\": 600\n        },\n        {\n            \"min\": 600,\n            \"max\": 800\n        }\n    ],\n    \"waterTemperature\": [\n        {\n            \"min\": 20,\n            \"max\": 25\n        },\n        {\n            \"min\": 23,\n            \"max\": 28\n        },\n        {\n            \"min\": 25,\n            \"max\": 30\n        }\n    ],\n    \"lightSchedule\": [\n        [\n            {\n                \"hour\": 8,\n                \"minute\": 20,\n                \"state\": true\n            },\n            {\n                \"hour\": 20,\n                \"minute\": 0,\n                \"state\": false\n            }\n        ],\n        [\n            {\n                \"hour\": 7,\n                \"minute\": 0,\n                \"state\": true\n            },\n            {\n                \"hour\": 21,\n                \"minute\": 0,\n                \"state\": false\n            }\n        ],\n        [\n            {\n                \"hour\": 7,\n                \"minute\": 40,\n                \"state\": true\n            },\n            {\n                \"hour\": 20,\n                \"minute\": 45,\n                \"state\": false\n            }\n        ]\n    ],\n    \"nutrientProportion\": [\n        {\n            \"nutrientA\": 2,\n            \"nutrientB\": 3\n        },\n        {\n            \"nutrientA\": 1,\n            \"nutrientB\": 1\n        },\n        {\n            \"nutrientA\": 2,\n            \"nutrientB\": 1\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{raspberry_url}}/profile/12",
+              "host": ["{{raspberry_url}}"],
+              "path": ["profile", "12"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Limit",
+      "item": [
+        {
+          "name": "Limit",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/limit",
+              "host": ["{{raspberry_url}}"],
+              "path": ["limit"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Limite Específico",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"min\": 400,\n    \"max\": 600\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{raspberry_url}}/limit/condutivity",
+              "host": ["{{raspberry_url}}"],
+              "path": ["limit", "condutivity"]
+            },
+            "description": "temperature\n\nhumidity\n\nph\n\nec\n\nwater_temperature"
+          },
+          "response": []
+        },
+        {
+          "name": "Limite Específico",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/limit/pH",
+              "host": ["{{raspberry_url}}"],
+              "path": ["limit", "pH"]
+            },
+            "description": "temperature_min\n\ntemperature_max\n\nhumidity_min\n\nhumidity_max\n\nph_min\n\nph_max\n\nec_min\n\nec_max\n\nwater_temperature_min\n\nwater_temperature_max"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Light",
+      "item": [
+        {
+          "name": "Light Schedule",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"hour\": 15,\n    \"minute\": 50,\n    \"state\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{raspberry_url}}/light/schedule",
+              "host": ["{{raspberry_url}}"],
+              "path": ["light", "schedule"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Light Schedule",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/light/schedule/3",
+              "host": ["{{raspberry_url}}"],
+              "path": ["light", "schedule", "3"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Light Schedule",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"hour\": 15,\n    \"minute\": 30,\n    \"state\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{raspberry_url}}/light/schedule/3",
+              "host": ["{{raspberry_url}}"],
+              "path": ["light", "schedule", "3"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Light Schedule",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/light/schedule",
+              "host": ["{{raspberry_url}}"],
+              "path": ["light", "schedule"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Nutrient",
+      "item": [
+        {
+          "name": "Nutrient Proportion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/nutrient/proportion",
+              "host": ["{{raspberry_url}}"],
+              "path": ["nutrient", "proportion"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Nutrient Proportion",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nutrientA\": 5,\n    \"nutrientB\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{raspberry_url}}/nutrient/proportion",
+              "host": ["{{raspberry_url}}"],
+              "path": ["nutrient", "proportion"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"user\",\n    \"password\": \"1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{raspberry_url}}/login",
+              "host": ["{{raspberry_url}}"],
+              "path": ["login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{raspberry_url}}/logout",
+              "host": ["{{raspberry_url}}"],
+              "path": ["logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"oldPassword\": \"1234\",\n    \"newPassword\": \"1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{raspberry_url}}/change-password",
+              "host": ["{{raspberry_url}}"],
+              "path": ["change-password"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Camera",
+      "item": [
+        {
+          "name": "Photo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/cam/photo",
+              "host": ["{{raspberry_url}}"],
+              "path": ["cam", "photo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Timelapse",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/cam/timelapse",
+              "host": ["{{raspberry_url}}"],
+              "path": ["cam", "timelapse"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Actuator",
+      "item": [
+        {
+          "name": "Actuator",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/actuator",
+              "host": ["{{raspberry_url}}"],
+              "path": ["actuator"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actuator Set",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/actuator/exhaustor/off",
+              "host": ["{{raspberry_url}}"],
+              "path": ["actuator", "exhaustor", "off"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actuator Set For",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/actuator/light/on_for/3",
+              "host": ["{{raspberry_url}}"],
+              "path": ["actuator", "light", "on_for", "3"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "Maintaince Job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{raspberry_url}}/job/maintance",
+              "host": ["{{raspberry_url}}"],
+              "path": ["job", "maintance"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "raspberry_url",
+      "value": "http://177.45.94.138:3000"
+    }
+  ]
 }

@@ -295,7 +295,7 @@ def get_profiles():
         return jsonify(profiles), 200
     elif request.method == 'POST':
         data = request.get_json()
-        profileService.insert_profile(data['name'], data['temperature'], data['humidity'], data['pH'], data['condutivity'], data['waterTemperature'], data['lightSchedule'], data['nutrientProportion'])
+        profileService.insert_profile(data['name'], data['airTemperature'], data['humidity'], data['pH'], data['condutivity'], data['waterTemperature'], data['lightSchedule'], data['nutrientProportion'])
         return jsonify({"result": True}), 200
 
 @app.route('/profile/<id>', methods=['GET', 'DELETE', 'PUT'])
@@ -303,7 +303,7 @@ def get_profiles():
 def action_profile(id):
     if request.method == 'PUT':
         data = request.get_json()
-        profileService.update_profile(id, data['name'], data['temperature'], data['humidity'], data['pH'], data['condutivity'], data['waterTemperature'], data['lightSchedule'], data['nutrientProportion'])
+        profileService.update_profile(id, data['name'], data['airTemperature'], data['humidity'], data['pH'], data['condutivity'], data['waterTemperature'], data['lightSchedule'], data['nutrientProportion'])
         profileService.update_limits_for_days_by_profile()
         return jsonify({"result": True}), 200
     elif request.method == 'DELETE':

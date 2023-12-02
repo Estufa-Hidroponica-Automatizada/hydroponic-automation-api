@@ -98,7 +98,7 @@ class ProfileService():
         return {
             "id": profile_list[0],
             "name": profile_list[1],
-            "temperature":  self.build_list_limits(ast.literal_eval(profile_list[2]), ast.literal_eval(profile_list[3])),
+            "airTemperature":  self.build_list_limits(ast.literal_eval(profile_list[2]), ast.literal_eval(profile_list[3])),
             "humidity":  self.build_list_limits(ast.literal_eval(profile_list[4]), ast.literal_eval(profile_list[5])),
             "pH":  self.build_list_limits(ast.literal_eval(profile_list[6]), ast.literal_eval(profile_list[7])),
             "condutivity":  self.build_list_limits(ast.literal_eval(profile_list[8]), ast.literal_eval(profile_list[9])),
