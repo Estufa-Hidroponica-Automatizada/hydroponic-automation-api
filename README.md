@@ -1,33 +1,37 @@
 # hydroponic-automation-api
-Respository for the Flask API behind an autonomous hydroponic plantantion made with Raspberry Pi
+Repositório da API feita com Flask para monitoramento e controle do sistema de cultivo hidropônico automatizado utilizando Raspberry Pi.\
+Este projeto foi desenvolvido como Trabalho de Conclusão de Curso do curso de Engenharia de Computação na Escola Politécnica da Universidade de São Paulo pelos alunos:
 
-# First steps
+- Brian Andrade Nunes
+- Marco Aurélio Condé Oliveira Prado
+- Silas Lima e Silva
 
-1. Set all pins correctly:
+## Configuração do sistema
 
-| Sensor            | Connection             |
-|-------------------|------------------------|
-| DHT22             | Arduino Digital 3      |
-| TDS               | Arduino Analog 3       |
-| Light             | Arduino Analog 2       |
-| pH                | Arduino Analog 0       |
-| Water Level       | Raspberry GPIO 24      |
-| Water Temperature | Arduino Digital 2      |
+1. Conecte os pinos conforme tabelas abaixo:
+
+| Sensor                              | Conexão           |
+|-------------------------------------|-------------------|
+| pH (PH4502C)                        | Arduino Analog 0  |
+| Luminosidade (LDR)                  | Arduino Analog 2  |
+| Condutividade (TDS)                 | Arduino Analog 3  |
+| Temperatura d'água (DS18B20)        | Arduino Digital 2 |
+| Temperatura do ar e umidade (DHT22) | Arduino Digital 3 |
+| Nível d'água                        | Raspberry GPIO 24 |
 
 
-| Actuator          | Connection             |
-|-------------------|------------------------|
-| Nutrient Pump A   | Raspberry GPIO 26      |
-| Nutrient Pump B   | Raspberry GPIO 16      |
-| Pump pH-          | Raspberry GPIO 6       |
-| Pump pH+          | Raspberry GPIO 5       |
-| Fan               | Raspberry GPIO 27      |
-| Exhaustor         | Raspberry GPIO 22      |
-| Light             | Raspberry GPIO 17      |
+| Actuator          | Connection        |
+|-------------------|-------------------|
+| Bomba pH+         | Raspberry GPIO 5  |
+| Bomba pH-         | Raspberry GPIO 6  |
+| Bomba Nutriente B | Raspberry GPIO 16 |
+| Painel de Luz     | Raspberry GPIO 17 |
+| Exaustor          | Raspberry GPIO 22 |
+| Bomba Nutriente A | Raspberry GPIO 26 |
+| Ventilador        | Raspberry GPIO 27 |
 
-2. Run ```arduino_estufa.ino``` into your Arduino.
-3. Connect Arduino and your Webcam into Raspberry's USB ports.
-
+2. Carregue e execute o arquivo ```arduino_estufa.ino``` no seu Arduino.
+3. Conecte o Arduino e a Webcam nas portas USB do Raspberry.
 
 # How to run for development
 
